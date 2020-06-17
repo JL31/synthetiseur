@@ -39,8 +39,20 @@ from datetime import datetime
 #
 # ==================================================================================================
 
-# ==================
+# ================
 @app.route("/")
+@login_required
+def first_page():
+
+    if current_user.is_anonymous:
+
+        return render_template("login.html")
+
+    else:
+
+        return redirect(url_for("index"))
+
+# ==================
 @app.route("/index")
 @login_required
 def index():

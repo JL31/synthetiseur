@@ -1,0 +1,51 @@
+.container
+{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -70%);
+}
+
+h1
+{
+    text-align: center;
+    margin-top: 5%;
+    color: rgb(20, 90, 20);
+}
+
+.username-button
+{
+    margin-top: 25%;
+    margin-bottom: 5%;
+}
+
+.password-button
+{
+    margin-bottom: 3%;
+}
+
+input
+{
+    height: 50px;
+}
+
+a
+{
+    text-decoration: none;
+    font-style: italic;
+    float: right;
+    margin-bottom: 5%;
+    color: white;
+    font-size: 0.8em;
+}
+
+.btn
+{
+    height: 50px;
+}
+
+body
+{
+    background-image: url("../images/reunion.jpg");
+    background-size: cover;
+}

@@ -22,12 +22,9 @@
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('index') }}">Accueil</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    {% if current_user.is_anonymous %}
-                        <li><a href="{{ url_for('login') }}">Connexion</a></li>
-                    {% else %}
+                    {% if not current_user.is_anonymous %}
                         <li><a href="{{ url_for('user_articles_list') }}">Liste de mes articles</a></li>
                         <li><a href="{{ url_for('create_article') }}">Créer un article</a></li>
                         <li><a href="{{ url_for('user', username = current_user.username) }}">Profil</a></li>                        
