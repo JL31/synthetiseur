@@ -21,8 +21,6 @@
                 <a class="navbar-brand" href="{{ url_for('index') }}">Synthétiseur</a>
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if not current_user.is_anonymous %}
                         <li><a href="{{ url_for('user_articles_list') }}">Liste de mes articles</a></li>
