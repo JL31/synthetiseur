@@ -51,6 +51,13 @@ def index():
         :rtype: str
     """
 
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
+
     return render_template("index.html", title = "Index")
 
 # =============================================
@@ -99,6 +106,13 @@ def logout():
         :rtype: str
     """
 
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
+
     logout_user()
 
     return redirect(url_for("index"))
@@ -116,6 +130,13 @@ def user(username):
         :return: the view to be displayed
         :rtype: str
     """
+
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
 
     user = User.query.filter_by(username = username).first_or_404()
 
@@ -137,6 +158,13 @@ def user_profile_edition():
         :return: the view to be displayed
         :rtype: str
     """
+
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
 
     form = UserProfileEditorForm(current_user.username)
 
@@ -171,15 +199,24 @@ def create_article():
         :rtype: str
     """
 
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        references = tmp_article.references.all()
+
+    else:
+
+        references = []
+
     form = CreateArticle()
 
     if form.validate_on_submit():
 
-        article = Article(title = form.title.data,
-                          synthesis = form.synthesis.data,
-                          user_id = current_user.user_id)
+        tmp_article = Article.query.filter_by(title = "TMP").first()
+        tmp_article.title = form.title.data
+        tmp_article.synthesis = form.synthesis.data
 
-        db.session.add(article)
         db.session.commit()
 
         flash("L'article a bien été ajouté")
@@ -189,7 +226,10 @@ def create_article():
     return render_template("create_article.html",
                            title = "Créer un article",
                            form = form,
-                           user_id = current_user.user_id)
+                           user_id = current_user.user_id,
+                           current_article_id = -1,
+                           references = references,
+                           submit_button_title = "Ajouter")
 
 # ===============================
 @app.route("/user_articles_list")
@@ -201,6 +241,13 @@ def user_articles_list():
         :return: the view to be displayed
         :rtype: str
     """
+
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
 
     articles_list = User.query.filter_by(username = current_user.username).first().articles.all()
 
@@ -221,6 +268,13 @@ def article(article_number):
         :return: the view to be displayed
         :rtype: str
     """
+
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
 
     article = Article.query.get_or_404(int(article_number))
 
@@ -252,7 +306,16 @@ def modify_article(article_number):
         :rtype: str
     """
 
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
+
     article = Article.query.get_or_404(int(article_number))
+
+    references = article.references.all()
 
     form = ModifyArticle()
 
@@ -276,7 +339,11 @@ def modify_article(article_number):
 
     return render_template("create_article.html",
                            title = "Modifier un article",
-                           form = form)
+                           form = form,
+                           user_id = current_user.user_id,
+                           current_article_id = article.article_id,
+                           references = references,
+                           submit_button_title = "Valider les modifications")
 
 # =======================================================================
 @app.route("/delete_article/<article_number>", methods = ["GET", "POST"])
@@ -291,6 +358,13 @@ def delete_article(article_number):
         :return: the view to be displayed
         :rtype: str
     """
+
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
 
     article = Article.query.get_or_404(int(article_number))
 
@@ -311,6 +385,13 @@ def reset_password_request():
         :return: the view to be displayed
         :rtype: str
     """
+
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
 
     if current_user.is_authenticated:
 
@@ -347,6 +428,13 @@ def reset_password(token):
         :rtype: str
     """
 
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+
+    if tmp_article:
+
+        db.session.delete(tmp_article)
+        db.session.commit()
+
     if current_user.is_authenticated:
 
         return redirect(url_for("index"))
@@ -371,57 +459,18 @@ def reset_password(token):
 
     return render_template("reset_password.html", form = form)
 
-# # ======================================================
-# @app.route("/add_keyword/<user_id>", methods = ["POST"])
-# @login_required
-# def add_keyword(user_id):
-#     """
-#         View function to add a keyword to an article (through AJAX request)
-
-#         :return: the view to be displayed
-#         :rtype: str
-#     """
-
-#     tmp_keyword = Keyword.query.filter_by(description = request.form["keywords"]).first()
-
-#     if tmp_keyword:
-
-#         emtpy_dict = {"already_exists": True}
-
-#         return jsonify(emtpy_dict)
-
-#     tmp_article = Article.query.filter_by(title = "TMP").first()
-
-#     if not tmp_article:
-
-#         tmp_article = Article(title = "TMP",
-#                               synthesis = "tmp",
-#                               user_id = int(user_id))
-
-#         db.session.add(tmp_article)
-#         db.session.commit()
-
-#         tmp_article = Article.query.filter_by(title = "TMP").first()
-
-#     keyword = Keyword(description = request.form["keywords"])
-
-#     tmp_article.keywords.append(keyword)
-
-#     db.session.commit()
-
-#     emtpy_dict = {"already_exists": False}
-
-#     return jsonify(emtpy_dict)
-
-# ======================================================
-@app.route("/add_reference/<user_id>", methods = ["POST"])
+# =============================================================================
+@app.route("/add_reference/<user_id>/<current_article_id>", methods = ["POST"])
 @login_required
-def add_reference(user_id):
+def add_reference(user_id, current_article_id):
     """
         View function to add a reference to an article (through AJAX request)
 
         :param user_id: the user id
         :type user_id: str
+
+        :param current_article_id: the current article id
+        :type current_article_id: str
 
         :return: the view to be displayed
         :rtype: str
@@ -429,18 +478,24 @@ def add_reference(user_id):
 
     data = {}
 
-    tmp_article = Article.query.filter_by(title = "TMP").first()
+    if int(current_article_id) != -1:
 
-    if not tmp_article:
+        tmp_article = Article.query.filter_by(article_id = int(current_article_id)).first()
 
-        tmp_article = Article(title = "TMP",
-                              synthesis = "tmp",
-                              user_id = int(user_id))
-
-        db.session.add(tmp_article)
-        db.session.commit()
+    else:
 
         tmp_article = Article.query.filter_by(title = "TMP").first()
+
+        if not tmp_article:
+
+            tmp_article = Article(title = "TMP",
+                                  synthesis = "tmp",
+                                  user_id = int(user_id))
+
+            db.session.add(tmp_article)
+            db.session.commit()
+
+            tmp_article = Article.query.filter_by(title = "TMP").first()
 
     reference = Reference(description = request.form["references"], article = tmp_article)
 
@@ -454,15 +509,18 @@ def add_reference(user_id):
 
     return jsonify(data)
 
-# ===============================================================
-@app.route("/delete_reference/<reference_id>", methods = ["GET"])
+# ====================================================================================
+@app.route("/delete_reference/<reference_id>/<current_article_id>", methods = ["GET"])
 @login_required
-def delete_reference(reference_id):
+def delete_reference(reference_id, current_article_id):
     """
         View function to delete a reference (through AJAX request)
 
         :param reference_id: the user id
         :type reference_id: str
+
+        :param current_article_id: the current article id
+        :type current_article_id: str
 
         :return: the view to be displayed
         :rtype: str
@@ -475,7 +533,14 @@ def delete_reference(reference_id):
     db.session.delete(reference)
     db.session.commit()
 
-    tmp_article = Article.query.filter_by(title = "TMP").first()
+    if int(current_article_id) != -1:
+
+        tmp_article = Article.query.filter_by(article_id = int(current_article_id)).first()
+
+    else:
+
+        tmp_article = Article.query.filter_by(title = "TMP").first()
+
     references = tmp_article.references.all()
 
     data["html_form"] = render_template("references_list.html",

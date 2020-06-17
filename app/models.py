@@ -144,7 +144,7 @@ class Article(db.Model):
     article_id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), index = True, unique = True)
     keywords = db.relationship("Keyword", secondary = article_keyword_association_table)
-    references = db.relationship("Reference", backref = "article", lazy = "dynamic")
+    references = db.relationship("Reference", backref = "article", lazy = "dynamic", cascade="all,delete")
     creation_date = db.Column(db.DateTime, index = True, default = datetime.utcnow)
     update_date = db.Column(db.DateTime, index = True, default = datetime.utcnow)
     synthesis = db.Column(db.Text())

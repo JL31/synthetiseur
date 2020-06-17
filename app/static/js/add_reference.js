@@ -10,7 +10,7 @@ $(function ()
 
         $.ajax(
         {
-            url: form.attr("action"),
+            url: form.attr("data-url"),
             type: form.attr("method"),
             data: form.serialize(),
             dataType: 'json',

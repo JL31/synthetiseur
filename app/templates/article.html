@@ -17,9 +17,9 @@
         Mot(s) clé(s) :<br>
         {% for keyword in article.keywords %}
             {% if loop.last %}
-                {{ keyword }} 
+                {{ keyword.description }} 
             {% else %}
-                {{ keyword }}, 
+                {{ keyword.description }}, 
             {% endif %}
         {% endfor %}
     </p>
@@ -27,7 +27,13 @@
     <p>
         Référence(s) :<br>
         {% for reference in article.references %}
-            [{{ loop.index }}] {{ reference }}<br>
+            {% if reference.description.startswith("https://") or reference.description.startswith("http://") %}
+                [{{ loop.index }}] <a href="{{ reference.description }}", target="_blank">{{ reference.description }}</a>
+            {% elif reference.description.startswith("www") %}
+                [{{ loop.index }}] <a href="http://{{ reference.description }}", target="_blank">{{ reference.description }}</a>
+            {% else %}
+                [{{ loop.index }}] {{ reference.description }}
+            {% endif %}<br>
         {% endfor %}
     </p>
 

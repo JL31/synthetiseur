@@ -5,7 +5,12 @@
     <h1>{{ title }}</h1>
     <hr>
     <div class="container">
-        <form action = "{{ url_for('add_reference', user_id = user_id) }}" method = "post" id="create-article-form">
+        <form action = ""
+              method = "post"
+              id="create-article-form"
+              data-url="{{ url_for('add_reference',
+                                   user_id = user_id,
+                                   current_article_id = current_article_id) }}">
             {{ form.hidden_tag() }}
             <div class="row">
                 <div class="form-group" style="width: 35%">
@@ -23,8 +28,8 @@
                 <div class="form-group" style="width: 35%">
                     {{ wtf.form_field(form.synthesis, class = "form-control", rows = "8") }}
                 </div>
-                <button type="submit" class="btn btn-success">Ajouter l'article</button>
-            </div>
+                <button type="submit" class="btn btn-success">{{ submit_button_title }}</button>
+            </div>  
         </form>
     </div>
 {% endblock %}
