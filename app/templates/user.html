@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Profil de {{ user.username }}</h1>
+
+    <hr>
+
+    <div>
+        <div class="list-group-item list-group-item-info">
+            Nom d'utilisateur
+        </div>
+
+        <br>&nbsp;&nbsp;{{ user.username }}
+
+        <br><br>
+
+        <div class="list-group-item list-group-item-info">
+            Adresse email
+        </div>
+
+        <br>&nbsp;&nbsp;{{ user.email }}
+
+    </div>
+
+    <hr>
+
+    <p><a href="{{ url_for('user_profile_edition') }}">Modifier mon profil</a></p>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>{{ article.title }}</h1>
+
+    <p class="text-muted">
+        Créé le {{ dates.article_creation_date_for_display }}<br>
+        Dernière mise-à-jour :
+        {% if dates.article_update_date != dates.article_creation_date %}
+            {{ dates.article_update_date_for_display }}
+        {% endif %}
+    </p>
+
+    <hr>
+
+    <p>
+        Mot(s) clé(s) :<br>
+        {% for keyword in article.keywords %}
+            {% if loop.last %}
+                {{ keyword }} 
+            {% else %}
+                {{ keyword }}, 
+            {% endif %}
+        {% endfor %}
+    </p>
+
+    <p>
+        Référence(s) :<br>
+        {% for reference in article.references %}
+            [{{ loop.index }}] {{ reference }}<br>
+        {% endfor %}
+    </p>
+
+    <hr>
+    
+    <p>
+        <b>Synthèse</b><br><br>
+        {{ article.synthesis }}
+    </p>
+
+    <hr>
+
+    <!-- {# <a href="{{ url_for('export_article', article_number = article.article_id ) }}">Exporter l'article au format PDF</a><br> #} -->
+    <a href="{{ url_for('modify_article', article_number = article.article_id ) }}">Modifier l'article</a><br>
+    <a href="{{ url_for('delete_article', article_number = article.article_id ) }}">Supprimer l'article</a><br><br>
+    <a href="{{ url_for('user_articles_list') }}">Retour à la liste de mes articles</a>
+{% endblock %}

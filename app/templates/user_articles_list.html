@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Liste de mes articles</h1>
+    <hr>
+    <div class="list-group">
+        {% for article in articles_list %}
+            <a href="{{ url_for('article', article_number = article.article_id) }}" class="list-group-item list-group-item-action">
+                {{ article.title }} 
+                {% for keyword in article.keywords %}
+                    {% if loop.first %}
+                        ({{ keyword }},&nbsp;
+                    {% elif loop.last %}
+                        {{ keyword }})
+                    {% else %}
+                        {{ keyword }},&nbsp;
+                    {% endif %}
+                {% endfor%}
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}
