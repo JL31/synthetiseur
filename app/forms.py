@@ -83,7 +83,6 @@ class CreateArticle(FlaskForm):
     """
 
     title = StringField("Titre", validators = [DataRequired()])
-    keywords = StringField("Mot(s) clé(s)")
     references = StringField("Référence(s)")
     synthesis = TextAreaField("Synthèse", validators = [DataRequired()])
     submit = SubmitField("Ajouter l'article")
@@ -95,7 +94,6 @@ class ModifyArticle(FlaskForm):
     """
 
     title = StringField("Titre", validators = [DataRequired()])
-    keywords = StringField("Mot(s) clé(s)")
     references = StringField("Référence(s)")
     synthesis = TextAreaField("Synthèse", validators = [DataRequired()])
     submit = SubmitField("Mdofier l'article")

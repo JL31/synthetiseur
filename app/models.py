@@ -23,11 +23,6 @@ import jwt
 #
 # ==================================================================================================
 
-article_keyword_association_table = db.Table("article_keyword_association_table",
-                                             db.Column("article_id", db.Integer, db.ForeignKey("article.article_id")),
-                                             db.Column("keyword_id", db.Integer, db.ForeignKey("keyword.keyword_id")))
-
-
 # ==================================================================================================
 #
 # CLASSES
@@ -143,7 +138,6 @@ class Article(db.Model):
 
     article_id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), index = True, unique = True)
-    keywords = db.relationship("Keyword", secondary = article_keyword_association_table)
     references = db.relationship("Reference", backref = "article", lazy = "dynamic", cascade="all,delete")
     creation_date = db.Column(db.DateTime, index = True, default = datetime.utcnow)
     update_date = db.Column(db.DateTime, index = True, default = datetime.utcnow)
@@ -160,26 +154,6 @@ class Article(db.Model):
         """
 
         return "<Article {}>".format(self.title)
-
-# ======================
-class Keyword(db.Model):
-    """
-        Class that represents a Keyword
-    """
-
-    keyword_id = db.Column(db.Integer, primary_key = True)
-    description = db.Column(db.String(40), index = True, unique = True)
-
-    # =================
-    def __repr__(self):
-        """
-            Method that enables to represent the class instance
-
-            :return: the username value
-            :rtype: str
-        """
-
-        return "<Keyword {}>".format(self.description)
 
 # ========================
 class Reference(db.Model):

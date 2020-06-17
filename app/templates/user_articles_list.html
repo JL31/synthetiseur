@@ -7,15 +7,6 @@
         {% for article in articles_list %}
             <a href="{{ url_for('article', article_number = article.article_id) }}" class="list-group-item list-group-item-action">
                 {{ article.title }} 
-                {% for keyword in article.keywords %}
-                    {% if loop.first %}
-                        ({{ keyword.description }},&nbsp;
-                    {% elif loop.last %}
-                        {{ keyword.description }})
-                    {% else %}
-                        {{ keyword.description }},&nbsp;
-                    {% endif %}
-                {% endfor%}
             </a>
         {% endfor %}
     </div>

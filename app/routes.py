@@ -12,7 +12,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 
 from app import app, db
-from app.models import User, Article, Keyword, Reference
+from app.models import User, Article, Reference
 from app.forms import LoginForm, UserProfileEditorForm, CreateArticle, ModifyArticle, ResetPasswordRequestForm, ResetPasswordForm
 from app.email import send_password_reset_email
 
@@ -545,6 +545,31 @@ def delete_reference(reference_id, current_article_id):
 
     data["html_form"] = render_template("references_list.html",
                                         references = references)
+
+    return jsonify(data)
+
+# ====================================================
+@app.route("/check_article_title", methods = ["POST"])
+@login_required
+def check_article_title():
+    """
+        View function to check if the current article title is already taken (through AJAX request)
+
+        :return: the view to be displayed
+        :rtype: str
+    """
+
+    data = {}
+
+    article = Article.query.filter_by(title = request.form["title"]).first()
+
+    if article:
+
+        data["title_already_exists"] = True
+
+    else:
+
+        data["title_already_exists"] = False
 
     return jsonify(data)
 

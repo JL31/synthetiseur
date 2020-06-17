@@ -14,18 +14,7 @@
     <hr>
 
     <p>
-        Mot(s) clé(s) :<br>
-        {% for keyword in article.keywords %}
-            {% if loop.last %}
-                {{ keyword.description }} 
-            {% else %}
-                {{ keyword.description }}, 
-            {% endif %}
-        {% endfor %}
-    </p>
-
-    <p>
-        Référence(s) :<br>
+        <b>Référence(s)</b><br><br>
         {% for reference in article.references %}
             {% if reference.description.startswith("https://") or reference.description.startswith("http://") %}
                 [{{ loop.index }}] <a href="{{ reference.description }}", target="_blank">{{ reference.description }}</a>
@@ -48,6 +37,9 @@
 
     <!-- {# <a href="{{ url_for('export_article', article_number = article.article_id ) }}">Exporter l'article au format PDF</a><br> #} -->
     <a href="{{ url_for('modify_article', article_number = article.article_id ) }}">Modifier l'article</a><br>
-    <a href="{{ url_for('delete_article', article_number = article.article_id ) }}">Supprimer l'article</a><br><br>
+    <a href="{{ url_for('delete_article', article_number = article.article_id ) }}">Supprimer l'article</a><br>
+
+    <hr>
+
     <a href="{{ url_for('user_articles_list') }}">Retour à la liste de mes articles</a>
 {% endblock %}
