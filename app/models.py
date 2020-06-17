@@ -188,7 +188,7 @@ class Reference(db.Model):
     """
 
     reference_id = db.Column(db.Integer, primary_key = True)
-    description = db.Column(db.String(100), index = True, unique = True)
+    description = db.Column(db.String(100), index = True)
     article_id = db.Column(db.Integer, db.ForeignKey("article.article_id"))
 
     # =================

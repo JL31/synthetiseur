@@ -371,24 +371,63 @@ def reset_password(token):
 
     return render_template("reset_password.html", form = form)
 
+# # ======================================================
+# @app.route("/add_keyword/<user_id>", methods = ["POST"])
+# @login_required
+# def add_keyword(user_id):
+#     """
+#         View function to add a keyword to an article (through AJAX request)
+
+#         :return: the view to be displayed
+#         :rtype: str
+#     """
+
+#     tmp_keyword = Keyword.query.filter_by(description = request.form["keywords"]).first()
+
+#     if tmp_keyword:
+
+#         emtpy_dict = {"already_exists": True}
+
+#         return jsonify(emtpy_dict)
+
+#     tmp_article = Article.query.filter_by(title = "TMP").first()
+
+#     if not tmp_article:
+
+#         tmp_article = Article(title = "TMP",
+#                               synthesis = "tmp",
+#                               user_id = int(user_id))
+
+#         db.session.add(tmp_article)
+#         db.session.commit()
+
+#         tmp_article = Article.query.filter_by(title = "TMP").first()
+
+#     keyword = Keyword(description = request.form["keywords"])
+
+#     tmp_article.keywords.append(keyword)
+
+#     db.session.commit()
+
+#     emtpy_dict = {"already_exists": False}
+
+#     return jsonify(emtpy_dict)
+
 # ======================================================
-@app.route("/add_keyword/<user_id>", methods = ["POST"])
+@app.route("/add_reference/<user_id>", methods = ["POST"])
 @login_required
-def add_keyword(user_id):
+def add_reference(user_id):
     """
-        View function for a User to reset his password
+        View function to add a reference to an article (through AJAX request)
+
+        :param user_id: the user id
+        :type user_id: str
 
         :return: the view to be displayed
         :rtype: str
     """
 
-    tmp_keyword = Keyword.query.filter_by(description = request.form["keywords"]).first()
-
-    if tmp_keyword:
-
-        emtpy_dict = {"already_exists": True}
-
-        return jsonify(emtpy_dict)
+    data = {}
 
     tmp_article = Article.query.filter_by(title = "TMP").first()
 
@@ -403,15 +442,46 @@ def add_keyword(user_id):
 
         tmp_article = Article.query.filter_by(title = "TMP").first()
 
-    keyword = Keyword(description = request.form["keywords"])
+    reference = Reference(description = request.form["references"], article = tmp_article)
 
-    tmp_article.keywords.append(keyword)
-
+    db.session.add(reference)
     db.session.commit()
 
-    emtpy_dict = {"already_exists": False}
+    references = tmp_article.references.all()
 
-    return jsonify(emtpy_dict)
+    data["html_form"] = render_template("references_list.html",
+                                        references = references)
+
+    return jsonify(data)
+
+# ===============================================================
+@app.route("/delete_reference/<reference_id>", methods = ["GET"])
+@login_required
+def delete_reference(reference_id):
+    """
+        View function to delete a reference (through AJAX request)
+
+        :param reference_id: the user id
+        :type reference_id: str
+
+        :return: the view to be displayed
+        :rtype: str
+    """
+
+    data = {}
+
+    reference = Reference.query.filter_by(reference_id = reference_id).first()
+
+    db.session.delete(reference)
+    db.session.commit()
+
+    tmp_article = Article.query.filter_by(title = "TMP").first()
+    references = tmp_article.references.all()
+
+    data["html_form"] = render_template("references_list.html",
+                                        references = references)
+
+    return jsonify(data)
 
 
 # ==================================================================================================

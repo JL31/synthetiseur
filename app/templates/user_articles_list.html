@@ -9,11 +9,11 @@
                 {{ article.title }} 
                 {% for keyword in article.keywords %}
                     {% if loop.first %}
-                        ({{ keyword }},&nbsp;
+                        ({{ keyword.description }},&nbsp;
                     {% elif loop.last %}
-                        {{ keyword }})
+                        {{ keyword.description }})
                     {% else %}
-                        {{ keyword }},&nbsp;
+                        {{ keyword.description }},&nbsp;
                     {% endif %}
                 {% endfor%}
             </a>
