@@ -13,13 +13,13 @@ h1
     color: rgb(20, 90, 20);
 }
 
-.username-button
+.username-field
 {
     margin-top: 25%;
     margin-bottom: 5%;
 }
 
-.password-button
+.password-field
 {
     margin-bottom: 3%;
 }
@@ -39,7 +39,7 @@ a
     font-size: 0.8em;
 }
 
-.btn
+.field, .btn
 {
     height: 50px;
 }

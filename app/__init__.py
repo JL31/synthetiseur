@@ -19,6 +19,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
+from elasticsearch import Elasticsearch
 
 app = Flask(__name__,
             static_url_path = "/app/static")    # https://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
@@ -33,6 +34,15 @@ login.login_view = "login"
 mail = Mail(app)
 
 bootstrap = Bootstrap(app)
+
+if app.config["ELASTICSEARCH_URL"]:
+
+    app.elasticsearch = Elasticsearch([app.config["ELASTICSEARCH_URL"]])    
+
+else:
+
+    app.elasticsearch = None    
+
 
 from app import routes, models, errors
 

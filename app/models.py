@@ -9,6 +9,7 @@
 # ==================================================================================================
 
 from app import db, app, login
+from app.search import add_to_index, remove_from_index, query_index
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
@@ -29,13 +30,139 @@ import jwt
 #
 # ==================================================================================================
 
+# ============================
+class SearchableMixin(object):
+    """
+        Class to make the link between an SQLAlchemy model and the Elasticsearch module
+    """
+
+    # =========================================
+    @classmethod
+    def search(cls, expression, page, per_page):
+        """
+            Class method to execute an Elasticsearch search of the input "expression"
+            for the associated input "cls" (with input options values "page" and "per_page")
+
+            :param cls: a class
+            :type cls: class
+
+            :param expression: the searched text 
+            :type expression: str
+
+            :param page: the page number from the query results
+            :type page: int
+
+            :param per_page: the number of results per page from the query results
+            :type per_page: int
+
+            :return: ...
+            :rtype: tuple(, int)
+        """
+
+        ids, total = query_index(cls.__tablename__, expression, page, per_page)
+
+        if total == 0:
+
+            return cls.query.filter_by(id = 0), 0
+
+        when = []
+
+        # for i in range(len(ids)):
+
+        #     when.append((ids[i], i))
+        for list_index, list_value in enumerate(ids):
+
+            when.append((list_value, list_index))
+
+        return cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value = cls.id)), total
+
+    # ==============================
+    @classmethod
+    def before_commit(cls, session):
+        """
+            Class method to save the objects that are going to be :
+
+            - added ("new")
+            - modified ("dirty")
+            - removed ("deleted")
+
+            :param cls: a class
+            :type cls: class
+
+            :param session: a session
+            :type session: ...
+
+            :return: Nothing
+            :rtype: None
+        """
+
+        session._changes = { "add": list(session.new),
+                             "update": list(session.dirty),
+                             "delete": list(session.deleted)
+                           }
+
+    # =============================
+    @classmethod
+    def after_commit(cls, session):
+        """
+            Class method to make changes on the Elasticsearch side,
+            i.e. to call the corresponding indexing function depending on the case
+            (add, modify or delete)
+
+            :param cls: a class
+            :type cls: class
+
+            :param session: a session
+            :type session: ..
+
+            :return: nothing
+            :rtype: None
+        """
+
+        for obj in session._changes["add"]:
+
+            if isinstance(obj, SearchableMixin):
+
+                add_to_index(obj.__tablename__, obj)
+
+        for obj in session._changes["update"]:
+
+            if isinstance(obj, SearchableMixin):
+
+                add_to_index(obj.__tablename__, obj)
+
+        for obj in session._changes["delete"]:
+
+            if isinstance(obj, SearchableMixin):
+
+                remove_from_index(obj.__tablename__, obj)
+
+        session._changes = None
+
+    # ===============
+    @classmethod
+    def reindex(cls):
+        """
+            Class method to refresh an index 
+
+            :param cls: a class
+            :type cls: class
+
+            :return: ...
+            :rtype: ...
+        """
+
+        for obj in cls.query:
+
+            add_to_index(cls.__tablename__, obj)
+
 # ==============================
 class User(UserMixin, db.Model):
     """
         Class that represents a User
     """
 
-    user_id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(64), index = True, unique = True)
     email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
@@ -77,20 +204,6 @@ class User(UserMixin, db.Model):
 
         return check_password_hash(self.password_hash, password)
 
-    # ===============
-    def get_id(self):
-        """
-            Override of "get_id" method so that it can return the current instance "user_id" value
-            Without that the "get_id" method will fail because it expects the id to be nammed "id"
-            Here its nammed "user_id"
-            (see https://stackoverflow.com/questions/37472870/login-user-fails-to-get-user-id)
-
-            :return: the user id
-            :rtype: int
-        """
-
-        return self.user_id
-
     # ===================================================
     def get_reset_password_token(self, expires_in = 600):
         """
@@ -103,7 +216,9 @@ class User(UserMixin, db.Model):
             :rtype: str
         """
 
-        return jwt.encode({"reset_password": self.user_id, "exp": time() + expires_in},
+        return jwt.encode({ "reset_password": self.id,
+                            "exp": time() + expires_in
+                          },
                           app.config["SECRET_KEY"],
                           algorithm = "HS256").decode("utf-8")
 
@@ -130,19 +245,21 @@ class User(UserMixin, db.Model):
 
         return User.query.get(id)
 
-# ======================
-class Article(db.Model):
+# =======================================
+class Article(SearchableMixin, db.Model):
     """
         Class that represents an Article
     """
 
-    article_id = db.Column(db.Integer, primary_key = True)
+    __searchable__ = ["title", "synthesis"]
+
+    id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), index = True, unique = True)
     references = db.relationship("Reference", backref = "article", lazy = "dynamic", cascade="all,delete")
     creation_date = db.Column(db.DateTime, index = True, default = datetime.utcnow)
     update_date = db.Column(db.DateTime, index = True, default = datetime.utcnow)
     synthesis = db.Column(db.Text())
-    user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     # =================
     def __repr__(self):
@@ -161,9 +278,9 @@ class Reference(db.Model):
         Class that represents a Reference
     """
 
-    reference_id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key = True)
     description = db.Column(db.String(100), index = True)
-    article_id = db.Column(db.Integer, db.ForeignKey("article.article_id"))
+    article_id = db.Column(db.Integer, db.ForeignKey("article.id"))
 
     # =================
     def __repr__(self):
@@ -175,7 +292,6 @@ class Reference(db.Model):
         """
 
         return "<Reference {}>".format(self.description)
-
 
 # ==================================================================================================
 #
@@ -204,3 +320,6 @@ def load_user(user_id):
 # USE
 #
 # ==================================================================================================
+
+db.event.listen(db.session, "before_commit", SearchableMixin.before_commit)
+db.event.listen(db.session, "after_commit", SearchableMixin.after_commit)

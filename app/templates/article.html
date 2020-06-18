@@ -3,41 +3,45 @@
 {% block app_content %}
     <h1>{{ article.title }}</h1>
 
-    <p class="text-muted">
-        Créé le {{ dates.article_creation_date_for_display }}<br>
-        Dernière mise-à-jour :
-        {% if dates.article_update_date != dates.article_creation_date %}
-            {{ dates.article_update_date_for_display }}
-        {% endif %}
-    </p>
+    <div class="text-muted">
+        <p>
+            Créé le {{ dates.article_creation_date_for_display }}<br>
+            Dernière mise-à-jour :
+            {% if dates.article_update_date != dates.article_creation_date %}
+                {{ dates.article_update_date_for_display }}
+            {% endif %}
+        </p>
+    </div>
 
     <hr>
 
-    <p>
-        <b>Référence(s)</b><br><br>
-        {% for reference in article.references %}
-            {% if reference.description.startswith("https://") or reference.description.startswith("http://") %}
-                [{{ loop.index }}] <a href="{{ reference.description }}", target="_blank">{{ reference.description }}</a>
-            {% elif reference.description.startswith("www") %}
-                [{{ loop.index }}] <a href="http://{{ reference.description }}", target="_blank">{{ reference.description }}</a>
-            {% else %}
-                [{{ loop.index }}] {{ reference.description }}
-            {% endif %}<br>
-        {% endfor %}
-    </p>
+    <div>
+        <p><b>Référence(s)</b></p>
+        <p>
+            {% for reference in article.references %}
+                {% if reference.description.startswith("https://") or reference.description.startswith("http://") %}
+                    [{{ loop.index }}] <a href="{{ reference.description }}", target="_blank">{{ reference.description }}</a>
+                {% elif reference.description.startswith("www") %}
+                    [{{ loop.index }}] <a href="http://{{ reference.description }}", target="_blank">{{ reference.description }}</a>
+                {% else %}
+                    [{{ loop.index }}] {{ reference.description }}
+                {% endif %}<br>
+            {% endfor %}
+        </p>
+    </div>
 
     <hr>
     
-    <p>
-        <b>Synthèse</b><br><br>
-        {{ article.synthesis }}
-    </p>
+    <div>
+        <p><b>Synthèse</b></p>
+        <p style="white-space: pre-wrap">{{ article.synthesis }}</p>   <!-- "pre-wrap" for the spaces and break lines to be taken into account -->
+    </div>
 
     <hr>
 
-    <!-- {# <a href="{{ url_for('export_article', article_number = article.article_id ) }}">Exporter l'article au format PDF</a><br> #} -->
-    <a href="{{ url_for('modify_article', article_number = article.article_id ) }}">Modifier l'article</a><br>
-    <a href="{{ url_for('delete_article', article_number = article.article_id ) }}">Supprimer l'article</a><br>
+    <!-- {# <a href="{{ url_for('export_article', article_number = article.id ) }}">Exporter l'article au format PDF</a><br> #} -->
+    <a href="{{ url_for('modify_article', article_number = article.id ) }}">Modifier l'article</a><br>
+    <a href="{{ url_for('delete_article', article_number = article.id ) }}">Supprimer l'article</a><br>
 
     <hr>
 

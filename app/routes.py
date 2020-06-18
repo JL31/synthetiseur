@@ -8,12 +8,12 @@
 #
 # ==================================================================================================
 
-from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import render_template, flash, redirect, url_for, request, jsonify, g
 from flask_login import current_user, login_user, logout_user, login_required
 
 from app import app, db
 from app.models import User, Article, Reference
-from app.forms import LoginForm, UserProfileEditorForm, CreateArticle, ModifyArticle, ResetPasswordRequestForm, ResetPasswordForm
+from app.forms import LoginForm, UserProfileEditorForm, CreateArticle, ModifyArticle, ResetPasswordRequestForm, ResetPasswordForm, SearchForm
 from app.email import send_password_reset_email
 
 from werkzeug.urls import url_parse
@@ -38,6 +38,20 @@ from datetime import datetime
 # FUNCTIONS
 #
 # ==================================================================================================
+
+# ===================
+@app.before_request
+def before_request():
+    """
+        Function performed before each request to add the SearchForm instance to each page
+
+        :return: nothing
+        :rtype: None
+    """
+
+    if current_user.is_authenticated:
+
+        g.search_form = SearchForm()
 
 # ==================
 @app.route("/")
@@ -226,7 +240,7 @@ def create_article():
     return render_template("create_article.html",
                            title = "Créer un article",
                            form = form,
-                           user_id = current_user.user_id,
+                           user_id = current_user.id,
                            current_article_id = -1,
                            references = references,
                            submit_button_title = "Ajouter")
@@ -330,7 +344,7 @@ def modify_article(article_number):
 
         flash("L'article a bien été modifié")
 
-        return redirect(url_for("article", article_number = article.article_id))
+        return redirect(url_for("article", article_number = article.id))
 
     elif request.method == "GET":
 
@@ -340,8 +354,8 @@ def modify_article(article_number):
     return render_template("create_article.html",
                            title = "Modifier un article",
                            form = form,
-                           user_id = current_user.user_id,
-                           current_article_id = article.article_id,
+                           user_id = current_user.id,
+                           current_article_id = article.id,
                            references = references,
                            submit_button_title = "Valider les modifications")
 
@@ -480,7 +494,7 @@ def add_reference(user_id, current_article_id):
 
     if int(current_article_id) != -1:
 
-        tmp_article = Article.query.filter_by(article_id = int(current_article_id)).first()
+        tmp_article = Article.query.filter_by(id = int(current_article_id)).first()
 
     else:
 
@@ -528,14 +542,14 @@ def delete_reference(reference_id, current_article_id):
 
     data = {}
 
-    reference = Reference.query.filter_by(reference_id = reference_id).first()
+    reference = Reference.query.filter_by(id = reference_id).first()
 
     db.session.delete(reference)
     db.session.commit()
 
     if int(current_article_id) != -1:
 
-        tmp_article = Article.query.filter_by(article_id = int(current_article_id)).first()
+        tmp_article = Article.query.filter_by(id = int(current_article_id)).first()
 
     else:
 
@@ -572,6 +586,49 @@ def check_article_title():
         data["title_already_exists"] = False
 
     return jsonify(data)
+
+# ===================
+@app.route("/search")
+@login_required
+def search():
+    """
+        View function to search for words among Article title and synthesis
+
+        :return: the view to be displayed
+        :rtype: str
+    """
+
+    if not g.search_form.validate():
+
+        return redirect(url_for("user_articles_list"))
+
+    page = request.args.get("page", 1, type = int)
+
+    articles, total = Article.search(g.search_form.q.data,
+                                     page,
+                                     app.config["SEARCH_ARTICLES_PER_PAGE"])
+
+    if total > page * app.config["SEARCH_ARTICLES_PER_PAGE"]:
+
+        next_url = url_for("search", q = g.search_form.q.data, page = page + 1)
+
+    else:
+
+        next_url = None
+
+    if page > 1:
+
+        prev_url = url_for("search", q = g.search_form.q.data, page = page - 1)
+
+    else:
+
+        prev_url = None
+
+    return render_template("search.html",
+                           title = "Résultat de la recherche",
+                           articles = articles,
+                           next_url = next_url,
+                           prev_url = prev_url)
 
 
 # ==================================================================================================

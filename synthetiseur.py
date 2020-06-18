@@ -1,6 +1,7 @@
 from app import app, db
 from app.models import User, Article, Reference
 
+# ==========================
 @app.shell_context_processor
 def make_shell_context():
     """
@@ -10,7 +11,7 @@ def make_shell_context():
         :rtype: dict
     """
 
-    return {"db":db,
+    return {"db": db,
             "User": User,
             "Article": Article,
             "Reference": Reference}
