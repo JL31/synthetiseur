@@ -1,0 +1,13 @@
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+Avant le lancement du serveur penser à lancer Elasticsearch (sinon la recherche d'article ne fonctionnera pas)
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+Commandes concernant Elasticsearch
+----------------------------------
+
+démarrage 	: sudo systemctl start elasticsearch
+arrêt		: sudo systemctl stop elasticsearch
+

@@ -228,6 +228,18 @@ def create_article():
     if form.validate_on_submit():
 
         tmp_article = Article.query.filter_by(title = "TMP").first()
+
+        if not tmp_article:
+
+            tmp_article = Article(title = "TMP",
+                                  synthesis = "tmp",
+                                  user_id = int(current_user.id))
+
+            db.session.add(tmp_article)
+            db.session.commit()
+
+            tmp_article = Article.query.filter_by(title = "TMP").first()
+
         tmp_article.title = form.title.data
         tmp_article.synthesis = form.synthesis.data
 
