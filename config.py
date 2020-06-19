@@ -9,6 +9,7 @@
 # ==================================================================================================
 
 import os
+from dotenv import load_dotenv
 
 
 # ==================================================================================================
@@ -18,6 +19,7 @@ import os
 # ==================================================================================================
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, ".env"))
 
 
 # ==================================================================================================
@@ -50,7 +52,6 @@ class Config(object):
 
     ELASTICSEARCH_URL = os.environ.get("ELASTICSEARCH_URL")
 
-    # SEARCH_ARTICLE_PAGE = os.environ.get("SEARCH_ARTICLE_PAGE")
     SEARCH_ARTICLES_PER_PAGE = int(os.environ.get("SEARCH_ARTICLES_PER_PAGE"))
 
 
