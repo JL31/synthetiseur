@@ -53,6 +53,9 @@ def before_request():
 
         g.search_form = SearchForm()
 
+        articles = current_user.articles.all()
+        g.number_of_articles = len(articles)
+
 # ==================
 @app.route("/")
 @app.route("/index")
@@ -145,6 +148,10 @@ def user(username):
         :rtype: str
     """
 
+    if username == "invite":
+
+        return redirect(url_for("index"))
+
     tmp_article = Article.query.filter_by(title = "TMP").first()
 
     if tmp_article:
@@ -212,6 +219,10 @@ def create_article():
         :return: the view to be displayed
         :rtype: str
     """
+
+    if current_user.username == "invite" and g.number_of_articles >= 5:
+
+        return redirect(url_for("index"))
 
     tmp_article = Article.query.filter_by(title = "TMP").first()
 

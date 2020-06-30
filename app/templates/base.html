@@ -31,8 +31,14 @@
                 <ul class="nav navbar-nav navbar-right">
                     {% if not current_user.is_anonymous %}
                         <li><a href="{{ url_for('user_articles_list') }}">Liste de mes articles</a></li>
-                        <li><a href="{{ url_for('create_article') }}">Créer un article</a></li>
-                        <li><a href="{{ url_for('user', username = current_user.username) }}">Profil</a></li>                        
+                        {% if current_user.username == "invite" and g.number_of_articles == 5 %}
+                            <li><a style="color:red">Nombre maximum d'article atteint</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('create_article') }}">Créer un article</a></li>
+                        {% endif %}
+                        {% if current_user.username != "invite" %}
+                            <li><a href="{{ url_for('user', username = current_user.username) }}">Profil</a></li>
+                        {% endif %}
                         <li><a href="{{ url_for('logout') }}">Déconnexion</a></li>
                     {% endif %}
                 </ul>
