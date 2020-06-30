@@ -408,6 +408,8 @@ def delete_article(article_number):
     db.session.delete(article)
     db.session.commit()
 
+    flash("L'article a bien été suprrimé")
+
     return redirect(url_for("user_articles_list"))
 
 # ==============================================================
@@ -652,6 +654,31 @@ def search():
                            articles = articles,
                            next_url = next_url,
                            prev_url = prev_url)
+
+# ====================================================================================================
+@app.route("/article_deletion_confirmation_modal_content_loading/<article_number>", methods = ["GET"])
+@login_required
+def article_deletion_confirmation_modal_content_loading(article_number):
+    """
+        View function to search for words among Article title and synthesis
+
+        :param article_number: selected article id
+        :type article_number: str
+
+        :return: the view to be displayed
+        :rtype: str
+    """
+
+    # fake form just to enable having the CSRF token value in the bootstrap modal form (using "form.hidden_tag()") 
+    form = ModifyArticle()
+
+    data = {}
+
+    data["html_form"] = render_template("modal_article_deletion.html",
+                                        article_number = article_number,
+                                        form = form)
+
+    return jsonify(data)
 
 
 # ==================================================================================================

@@ -39,11 +39,29 @@
 
     <hr>
 
-    <!-- {# <a href="{{ url_for('export_article', article_number = article.id ) }}">Exporter l'article au format PDF</a><br> #} -->
-    <a href="{{ url_for('modify_article', article_number = article.id ) }}">Modifier l'article</a><br>
-    <a href="{{ url_for('delete_article', article_number = article.id ) }}">Supprimer l'article</a><br>
+    <div class="article-options">
+        <button id="modify-article"
+                class="btn btn-info"
+                data-url="{{ url_for('modify_article', article_number = article.id ) }}">Modifier l'article</button>
+        <button id="delete-article"
+                class="btn btn-danger"
+                data-url="{{ url_for('article_deletion_confirmation_modal_content_loading', article_number = article.id) }}">Supprimer l'article</button>
+    </div>
 
     <hr>
 
     <a href="{{ url_for('user_articles_list') }}">Retour à la liste de mes articles</a>
+
+    <!-- Bootstrap modal -->
+    <div class="modal fade" id="modal-article" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/article_scripts.js') }}"></script>
 {% endblock %}

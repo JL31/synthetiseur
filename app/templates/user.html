@@ -24,5 +24,10 @@
 
     <hr>
 
-    <p><a href="{{ url_for('user_profile_edition') }}">Modifier mon profil</a></p>
+    <button id ="modify-user-profile" class="btn btn-info" data-url="{{ url_for('user_profile_edition') }}">Modifier mon profil</button>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/user_scripts.js') }}"></script>
 {% endblock %}
