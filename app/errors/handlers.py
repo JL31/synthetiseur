@@ -1,5 +1,5 @@
 """
-    Module to initialize the application
+    Module to handle the errors for the application
 """
 
 # ==================================================================================================
@@ -8,8 +8,10 @@
 #
 # ==================================================================================================
 
-from app import create_app, db
-from app.models import User, Article, Reference
+from flask import render_template
+
+from app import db
+from app.errors import bp
 
 
 # ==================================================================================================
@@ -17,10 +19,6 @@ from app.models import User, Article, Reference
 # INITIALIZATIONS
 #
 # ==================================================================================================
-
-# application instance creation
-app = create_app()
-
 
 # ==================================================================================================
 #
@@ -34,20 +32,25 @@ app = create_app()
 #
 # ==================================================================================================
 
-# ==========================
-@app.shell_context_processor
-def make_shell_context():
+# =========================
+@bp.app_errorhandler(404)
+def not_found_error(error):
     """
-        Function to configure the shell context
-
-        :return: the context
-        :rtype: dict
+        Function to display specific page for 400 error
     """
 
-    return {"db": db,
-            "User": User,
-            "Article": Article,
-            "Reference": Reference}
+    return render_template("errors/error_404.html"), 404
+
+# ========================
+@bp.app_errorhandler(500)
+def internal_error(error):
+    """
+        Function to display specific page for 500 error
+    """
+
+    db.session.rollback()
+
+    return render_template("errors/error_500.html"), 500
 
 
 # ==================================================================================================

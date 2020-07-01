@@ -1,5 +1,5 @@
 """
-    Module to handle the several routes for the application
+    Module to handle the several routes for the "main" blueprint
 """
 
 # ==================================================================================================
@@ -8,15 +8,14 @@
 #
 # ==================================================================================================
 
-from flask import render_template, flash, redirect, url_for, request, jsonify, g
-from flask_login import current_user, login_user, logout_user, login_required
+from flask import render_template, flash, redirect, url_for, request, jsonify, g, current_app
+from flask_login import current_user, login_required
 
-from app import app, db
+from app import db
 from app.models import User, Article, Reference
-from app.forms import LoginForm, UserProfileEditorForm, CreateArticle, ModifyArticle, ResetPasswordRequestForm, ResetPasswordForm, SearchForm
-from app.email import send_password_reset_email
 
-from werkzeug.urls import url_parse
+from app.main import bp
+from app.main.forms import CreateArticle, ModifyArticle, SearchForm
 
 from datetime import datetime
 
@@ -40,7 +39,7 @@ from datetime import datetime
 # ==================================================================================================
 
 # ===================
-@app.before_request
+@bp.before_request
 def before_request():
     """
         Function performed before each request to add the SearchForm instance to each page
@@ -57,8 +56,8 @@ def before_request():
         g.number_of_articles = len(articles)
 
 # ==================
-@app.route("/")
-@app.route("/index")
+@bp.route("/")
+@bp.route("/index")
 @login_required
 def index():
     """
@@ -75,142 +74,10 @@ def index():
         db.session.delete(tmp_article)
         db.session.commit()
 
-    return render_template("index.html", title = "Index")
-
-# =============================================
-@app.route("/login", methods = ["GET", "POST"])
-def login():
-    """
-        View function to login
-
-        :return: the view to be displayed
-        :rtype: str
-    """
-
-    if current_user.is_authenticated:
-
-        return redirect(url_for("index"))
-
-    form = LoginForm()
-
-    if form.validate_on_submit():
-
-        user = User.query.filter_by(username = form.username.data).first()
-
-        if user is None or not user.check_password(form.password.data):
-
-            flash("Nom d'utilisateur ou mot de passe incorrect")
-            return redirect(url_for("login"))
-
-        login_user(user, remember = form.remember_me.data)
-        next_page = request.args.get("next")
-
-        if not next_page or url_parse(next_page).netloc != "":
-
-            next_page = url_for("index")
-
-        return redirect(next_page)
-
-    return render_template("login.html", title = "Connexion", form = form)
-
-# ===================
-@app.route("/logout")
-def logout():
-    """
-        View function to logout
-
-        :return: the view to be displayed
-        :rtype: str
-    """
-
-    tmp_article = Article.query.filter_by(title = "TMP").first()
-
-    if tmp_article:
-
-        db.session.delete(tmp_article)
-        db.session.commit()
-
-    logout_user()
-
-    return redirect(url_for("login"))
-
-# ============================
-@app.route("/user/<username>")
-@login_required
-def user(username):
-    """
-        View function for a User to see its profile
-
-        :param username: the current username
-        :type username: str
-
-        :return: the view to be displayed
-        :rtype: str
-    """
-
-    if username == "invite":
-
-        return redirect(url_for("index"))
-
-    tmp_article = Article.query.filter_by(title = "TMP").first()
-
-    if tmp_article:
-
-        db.session.delete(tmp_article)
-        db.session.commit()
-
-    user = User.query.filter_by(username = username).first_or_404()
-
-    if user == current_user:
-
-        return render_template("user.html", user = user)
-
-    else:
-
-        return render_template("acces_denied.html")
+    return render_template("main/index.html", title = "Index")
 
 # ============================================================
-@app.route("/user_profile_edition", methods = ["GET", "POST"])
-@login_required
-def user_profile_edition():
-    """
-        View function for a User to edit its profile
-
-        :return: the view to be displayed
-        :rtype: str
-    """
-
-    tmp_article = Article.query.filter_by(title = "TMP").first()
-
-    if tmp_article:
-
-        db.session.delete(tmp_article)
-        db.session.commit()
-
-    form = UserProfileEditorForm(current_user.username)
-
-    if form.validate_on_submit():
-
-        current_user.username = form.username.data
-        current_user.email = form.email.data
-
-        db.session.commit()
-
-        flash("Ton profil a bien été mis-à-jour")
-
-        return redirect(url_for("user", username = current_user.username))
-
-    elif request.method == "GET":
-
-        form.username.data = current_user.username
-        form.email.data = current_user.email
-
-    return render_template("user_profile_editor.html",
-                           title = "Modifier mon profil",
-                           form = form)
-
-# ============================================================
-@app.route("/create_article", methods = ["GET", "POST"])
+@bp.route("/create_article", methods = ["GET", "POST"])
 @login_required
 def create_article():
     """
@@ -222,7 +89,7 @@ def create_article():
 
     if current_user.username == "invite" and g.number_of_articles >= 5:
 
-        return redirect(url_for("index"))
+        return redirect(url_for("main.index"))
 
     tmp_article = Article.query.filter_by(title = "TMP").first()
 
@@ -258,9 +125,9 @@ def create_article():
 
         flash("L'article a bien été ajouté")
 
-        return redirect(url_for("user_articles_list"))
+        return redirect(url_for("main.user_articles_list"))
 
-    return render_template("create_article.html",
+    return render_template("main/create_article.html",
                            title = "Créer un article",
                            form = form,
                            user_id = current_user.id,
@@ -269,7 +136,7 @@ def create_article():
                            submit_button_title = "Ajouter")
 
 # ===============================
-@app.route("/user_articles_list")
+@bp.route("/user_articles_list")
 @login_required
 def user_articles_list():
     """
@@ -288,12 +155,12 @@ def user_articles_list():
 
     articles_list = User.query.filter_by(username = current_user.username).first().articles.all()
 
-    return render_template("user_articles_list.html",
+    return render_template("main/user_articles_list.html",
                            title = "Liste de mes articles",
                            articles_list = articles_list)
 
 # =====================================
-@app.route("/article/<article_number>")
+@bp.route("/article/<article_number>")
 @login_required
 def article(article_number):
     """
@@ -327,10 +194,10 @@ def article(article_number):
              "article_update_date_for_display" : article_update_date_for_display
             }
 
-    return render_template("article.html", article = article, dates = dates)
+    return render_template("main/article.html", article = article, dates = dates)
 
 # =======================================================================
-@app.route("/modify_article/<article_number>", methods = ["GET", "POST"])
+@bp.route("/modify_article/<article_number>", methods = ["GET", "POST"])
 @login_required
 def modify_article(article_number):
     """
@@ -367,14 +234,14 @@ def modify_article(article_number):
 
         flash("L'article a bien été modifié")
 
-        return redirect(url_for("article", article_number = article.id))
+        return redirect(url_for("main.article", article_number = article.id))
 
     elif request.method == "GET":
 
         form.title.data = article.title
         form.synthesis.data = article.synthesis
 
-    return render_template("create_article.html",
+    return render_template("main/create_article.html",
                            title = "Modifier un article",
                            form = form,
                            user_id = current_user.id,
@@ -383,7 +250,7 @@ def modify_article(article_number):
                            submit_button_title = "Valider les modifications")
 
 # =======================================================================
-@app.route("/delete_article/<article_number>", methods = ["GET", "POST"])
+@bp.route("/delete_article/<article_number>", methods = ["GET", "POST"])
 @login_required
 def delete_article(article_number):
     """
@@ -410,96 +277,10 @@ def delete_article(article_number):
 
     flash("L'article a bien été suprrimé")
 
-    return redirect(url_for("user_articles_list"))
-
-# ==============================================================
-@app.route("/reset_password_request", methods = ["GET", "POST"])
-def reset_password_request():
-    """
-        View function for a User to ask for a password reset
-
-        :param article_number: selected article id
-        :type article_number: str
-
-        :return: the view to be displayed
-        :rtype: str
-    """
-
-    tmp_article = Article.query.filter_by(title = "TMP").first()
-
-    if tmp_article:
-
-        db.session.delete(tmp_article)
-        db.session.commit()
-
-    if current_user.is_authenticated:
-
-        return redirect(url_for("index"))
-
-    form = ResetPasswordRequestForm()
-
-    if form.validate_on_submit():
-
-        user = User.query.filter_by(email = form.email.data).first()
-
-        if user:
-
-            send_password_reset_email(user)
-
-        flash("Un email t'a été envoyé avec les instructions afin de réinitialiser ton mot de passe")
-
-        return redirect(url_for("login"))
-
-    return render_template("reset_password_request.html",
-                           title = "Réinitialisation du mot de passe",
-                           form = form)
-
-# ==============================================================
-@app.route("/reset_password/<token>", methods = ["GET", "POST"])
-def reset_password(token):
-    """
-        View function for a User to reset his password
-
-        :param token: the token generated during the password reset process
-        :type token: str
-
-        :return: the view to be displayed
-        :rtype: str
-    """
-
-    tmp_article = Article.query.filter_by(title = "TMP").first()
-
-    if tmp_article:
-
-        db.session.delete(tmp_article)
-        db.session.commit()
-
-    if current_user.is_authenticated:
-
-        return redirect(url_for("index"))
-
-    user = User.verify_reset_password_token(token)
-
-    if not user:
-
-        flash("Jeton invalide : le lien a peut-être expiré")
-        return redirect(url_for("index"))
-
-    form = ResetPasswordForm()
-
-    if form.validate_on_submit():
-
-        user.set_password(form.password.data)
-        db.session.commit()
-
-        flash("Ton mot de passe a bien été réinitialisé")
-
-        return redirect(url_for("login"))
-
-    return render_template("reset_password.html", form = form)
+    return redirect(url_for("main.user_articles_list"))
 
 # =============================================================================
-@app.route("/add_reference/<user_id>/<current_article_id>", methods = ["POST"])
+@bp.route("/add_reference/<user_id>/<current_article_id>", methods = ["POST"])
 @login_required
 def add_reference(user_id, current_article_id):
     """
@@ -543,13 +324,13 @@ def add_reference(user_id, current_article_id):
 
     references = tmp_article.references.all()
 
-    data["html_form"] = render_template("references_list.html",
+    data["html_form"] = render_template("main/references_list.html",
                                         references = references)
 
     return jsonify(data)
 
 # ====================================================================================
-@app.route("/delete_reference/<reference_id>/<current_article_id>", methods = ["GET"])
+@bp.route("/delete_reference/<reference_id>/<current_article_id>", methods = ["GET"])
 @login_required
 def delete_reference(reference_id, current_article_id):
     """
@@ -582,13 +363,13 @@ def delete_reference(reference_id, current_article_id):
 
     references = tmp_article.references.all()
 
-    data["html_form"] = render_template("references_list.html",
+    data["html_form"] = render_template("main/references_list.html",
                                         references = references)
 
     return jsonify(data)
 
 # ====================================================
-@app.route("/check_article_title", methods = ["POST"])
+@bp.route("/check_article_title", methods = ["POST"])
 @login_required
 def check_article_title():
     """
@@ -613,7 +394,7 @@ def check_article_title():
     return jsonify(data)
 
 # ===================
-@app.route("/search")
+@bp.route("/search")
 @login_required
 def search():
     """
@@ -625,17 +406,18 @@ def search():
 
     if not g.search_form.validate():
 
-        return redirect(url_for("user_articles_list"))
+        return redirect(url_for("main.user_articles_list"))
 
     page = request.args.get("page", 1, type = int)
 
     articles, total = Article.search(g.search_form.q.data,
                                      page,
-                                     app.config["SEARCH_ARTICLES_PER_PAGE"])
+                                     current_app.config["SEARCH_ARTICLES_PER_PAGE"])
 
-    if total > page * app.config["SEARCH_ARTICLES_PER_PAGE"]:
 
-        next_url = url_for("search", q = g.search_form.q.data, page = page + 1)
+    if total > page * current_app.config["SEARCH_ARTICLES_PER_PAGE"]:
+
+        next_url = url_for("main.search", q = g.search_form.q.data, page = page + 1)
 
     else:
 
@@ -643,20 +425,20 @@ def search():
 
     if page > 1:
 
-        prev_url = url_for("search", q = g.search_form.q.data, page = page - 1)
+        prev_url = url_for("main.search", q = g.search_form.q.data, page = page - 1)
 
     else:
 
         prev_url = None
 
-    return render_template("search.html",
+    return render_template("main/search.html",
                            title = "Résultat de la recherche",
                            articles = articles,
                            next_url = next_url,
                            prev_url = prev_url)
 
 # ====================================================================================================
-@app.route("/article_deletion_confirmation_modal_content_loading/<article_number>", methods = ["GET"])
+@bp.route("/article_deletion_confirmation_modal_content_loading/<article_number>", methods = ["GET"])
 @login_required
 def article_deletion_confirmation_modal_content_loading(article_number):
     """
@@ -674,7 +456,7 @@ def article_deletion_confirmation_modal_content_loading(article_number):
 
     data = {}
 
-    data["html_form"] = render_template("modal_article_deletion.html",
+    data["html_form"] = render_template("main/modal_article_deletion.html",
                                         article_number = article_number,
                                         form = form)
 

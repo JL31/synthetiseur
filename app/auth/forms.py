@@ -1,5 +1,5 @@
 """
-    Module to handle the several forms for the application
+    Module to handle the several forms for the "auth" blueprint
 """
 
 # ==================================================================================================
@@ -12,6 +12,7 @@ from flask import request
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email, ValidationError, EqualTo
+
 from app.models import User
 
 
@@ -77,28 +78,6 @@ class UserProfileEditorForm(FlaskForm):
 
                 raise ValidationError("Ce nom d'utilisateur est déjà pris, merci d'en choisir un autre")
 
-# =============================
-class CreateArticle(FlaskForm):
-    """
-        Class to create an a form to add an article
-    """
-
-    title = StringField("Titre", validators = [DataRequired()])
-    references = StringField("Référence(s)")
-    synthesis = TextAreaField("Synthèse", validators = [DataRequired()])
-    submit = SubmitField("Ajouter l'article")
-
-# =============================
-class ModifyArticle(FlaskForm):
-    """
-        Class to create an a form to modify an article
-    """
-
-    title = StringField("Titre", validators = [DataRequired()])
-    references = StringField("Référence(s)")
-    synthesis = TextAreaField("Synthèse", validators = [DataRequired()])
-    submit = SubmitField("Modifier l'article")
-
 # ========================================
 class ResetPasswordRequestForm(FlaskForm):
     """
@@ -117,30 +96,6 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField("Mot de passe", validators = [DataRequired()])
     password2 = PasswordField("Confirme le mot de passe", validators = [DataRequired(), EqualTo("password", "Les mots de passe doivent être identiques")])
     submit = SubmitField("Réinitialiser le mot de passe")
-
-# ==========================
-class SearchForm(FlaskForm):
-    """
-        Class to create a form to do an research among created Article title and synthesis fields values
-    """
-
-    q = StringField("Rechercher un article", validators = [DataRequired()])
-
-    # ==================================
-    def __init__(self, *args, **kwargs):
-        """
-            Class constructor
-        """
-
-        if "formdata" not in kwargs:
-
-            kwargs["formdata"] = request.args   # because the form will be submitted through GET and not POST
-
-        if "csrf_enabled" not in kwargs:
-
-            kwargs["csrf_enabled"] = False
-
-        super(SearchForm, self).__init__(*args, **kwargs)
 
 
 # ==================================================================================================

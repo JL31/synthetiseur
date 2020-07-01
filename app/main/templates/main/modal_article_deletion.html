@@ -1,7 +1,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 <form id="form-article-deletion"
-      action="{{ url_for('delete_article', article_number = article_number ) }}"
+      action="{{ url_for('main.delete_article', article_number = article_number ) }}"
       method="POST">
     {{ form.hidden_tag() }}
 

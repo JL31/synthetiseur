@@ -1,5 +1,5 @@
 """
-    Module to handle the errors for the application
+    Module to initialize the "user" blueprint
 """
 
 # ==================================================================================================
@@ -8,8 +8,13 @@
 #
 # ==================================================================================================
 
-from flask import render_template
-from app import app, db
+from flask import Blueprint
+
+bp = Blueprint("user",
+               __name__,
+               template_folder = "templates")
+
+from app.user import routes
 
 
 # ==================================================================================================
@@ -29,27 +34,6 @@ from app import app, db
 # FUNCTIONS
 #
 # ==================================================================================================
-
-# =========================
-@app.errorhandler(404)
-def not_found_error(error):
-    """
-        Function to display specific page for 400 error
-    """
-
-    return render_template("error_404.html"), 404
-
-# ========================
-@app.errorhandler(500)
-def internal_error(error):
-    """
-        Function to display specific page for 500 error
-    """
-
-    db.session.rollback()
-
-    return render_template("error_500.html"), 500
-
 
 # ==================================================================================================
 #

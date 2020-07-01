@@ -1,5 +1,5 @@
 """
-    Module to initialize the application
+    Module to handle the email sending through the application
 """
 
 # ==================================================================================================
@@ -8,8 +8,8 @@
 #
 # ==================================================================================================
 
-from app import create_app, db
-from app.models import User, Article, Reference
+from flask import render_template, current_app
+from app.email.email import send_email
 
 
 # ==================================================================================================
@@ -17,10 +17,6 @@ from app.models import User, Article, Reference
 # INITIALIZATIONS
 #
 # ==================================================================================================
-
-# application instance creation
-app = create_app()
-
 
 # ==================================================================================================
 #
@@ -34,20 +30,22 @@ app = create_app()
 #
 # ==================================================================================================
 
-# ==========================
-@app.shell_context_processor
-def make_shell_context():
+# ==================================
+def send_password_reset_email(user):
     """
-        Function to configure the shell context
+        Function that sends a password reset email to the user
 
-        :return: the context
-        :rtype: dict
+        :param user: the user that asked for password reset
+        :type user: app.model.User
     """
 
-    return {"db": db,
-            "User": User,
-            "Article": Article,
-            "Reference": Reference}
+    token = user.get_reset_password_token()
+
+    send_email("[Synthétiseur] Réinitialiser ton mot de passe",
+               sender = current_app.config["ADMINS"][0],
+               recipients = [user.email],
+               text_body = render_template("auth/reset_password_message.txt", user = user, token = token),
+               html_body = render_template("auth/reset_password_message.html", user = user, token = token))
 
 
 # ==================================================================================================

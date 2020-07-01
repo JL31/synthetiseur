@@ -8,18 +8,18 @@
         <form action = ""
               method = "post"
               id="create-article-form"
-              data-url="{{ url_for('add_reference',
+              data-url="{{ url_for('main.add_reference',
                                    user_id = user_id,
                                    current_article_id = current_article_id) }}">
             {{ form.hidden_tag() }}
             <div class="row">
-                <div id="title-field" class="form-group" style="width: 35%" data-url="{{ url_for('check_article_title') }}">
+                <div id="title-field" class="form-group" style="width: 35%" data-url="{{ url_for('main.check_article_title') }}">
                     {{ wtf.form_field(form.title, class = "form-control") }}
                 </div>
                 <div class="form-group" style="width: 35%">
                     {{ wtf.form_field(form.references, class = "form-control") }}
                     <div id="references-container">
-                        {% include "references_list.html" %}
+                        {% include "main/references_list.html" %}
                     </div>
                 </div>
                 <div class="form-group" style="width: 35%">

@@ -1,5 +1,5 @@
 """
-    Module to initialize the application
+    Module to initialize the "email" blueprint
 """
 
 # ==================================================================================================
@@ -8,8 +8,11 @@
 #
 # ==================================================================================================
 
-from app import create_app, db
-from app.models import User, Article, Reference
+from flask import Blueprint
+
+bp = Blueprint("email",
+               __name__,
+               template_folder = "templates")
 
 
 # ==================================================================================================
@@ -17,10 +20,6 @@ from app.models import User, Article, Reference
 # INITIALIZATIONS
 #
 # ==================================================================================================
-
-# application instance creation
-app = create_app()
-
 
 # ==================================================================================================
 #
@@ -33,22 +32,6 @@ app = create_app()
 # FUNCTIONS
 #
 # ==================================================================================================
-
-# ==========================
-@app.shell_context_processor
-def make_shell_context():
-    """
-        Function to configure the shell context
-
-        :return: the context
-        :rtype: dict
-    """
-
-    return {"db": db,
-            "User": User,
-            "Article": Article,
-            "Reference": Reference}
-
 
 # ==================================================================================================
 #

@@ -8,7 +8,8 @@
 #
 # ==================================================================================================
 
-from app import db, app, login
+from flask import current_app
+from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -67,9 +68,6 @@ class SearchableMixin(object):
 
         when = []
 
-        # for i in range(len(ids)):
-
-        #     when.append((ids[i], i))
         for list_index, list_value in enumerate(ids):
 
             when.append((list_value, list_index))
@@ -219,7 +217,7 @@ class User(UserMixin, db.Model):
         return jwt.encode({ "reset_password": self.id,
                             "exp": time() + expires_in
                           },
-                          app.config["SECRET_KEY"],
+                          current_app.config["SECRET_KEY"],
                           algorithm = "HS256").decode("utf-8")
 
     # =====================================
@@ -237,7 +235,7 @@ class User(UserMixin, db.Model):
 
         try:
 
-            id = jwt.decode(token, app.config["SECRET_KEY"], algorithms = ["HS256"])["reset_password"]
+            id = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms = ["HS256"])["reset_password"]
 
         except:
 
