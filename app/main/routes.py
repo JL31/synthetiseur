@@ -325,7 +325,8 @@ def add_reference(user_id, current_article_id):
     references = tmp_article.references.all()
 
     data["html_form"] = render_template("main/references_list.html",
-                                        references = references)
+                                        references = references,
+                                        current_article_id = current_article_id)
 
     return jsonify(data)
 
@@ -348,7 +349,7 @@ def delete_reference(reference_id, current_article_id):
 
     data = {}
 
-    reference = Reference.query.filter_by(id = reference_id).first()
+    reference = Reference.query.filter_by(id = int(reference_id)).first()
 
     db.session.delete(reference)
     db.session.commit()
@@ -364,7 +365,8 @@ def delete_reference(reference_id, current_article_id):
     references = tmp_article.references.all()
 
     data["html_form"] = render_template("main/references_list.html",
-                                        references = references)
+                                        references = references,
+                                        current_article_id = current_article_id)
 
     return jsonify(data)
 
