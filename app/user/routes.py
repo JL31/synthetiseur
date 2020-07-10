@@ -8,7 +8,7 @@
 #
 # ==================================================================================================
 
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, abort
 from flask_login import current_user, login_required
 
 from app import db
@@ -37,7 +37,7 @@ from app.user.forms import UserProfileEditorForm
 # ==================================================================================================
 
 # ============================
-@bp.route("/user/<username>")
+@bp.route("/<username>")
 @login_required
 def user(username):
     """
@@ -50,7 +50,7 @@ def user(username):
         :rtype: str
     """
 
-    if username == "invite":
+    if current_user.is_guest:
 
         return redirect(url_for("main.index"))
 
@@ -69,7 +69,7 @@ def user(username):
 
     else:
 
-        return render_template("main/acces_denied.html")
+        abort(404)
 
 # ============================================================
 @bp.route("/user_profile_edition", methods = ["GET", "POST"])

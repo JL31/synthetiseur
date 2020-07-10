@@ -48,14 +48,23 @@ input
     height: 50px;
 }
 
-a
+.login-links
 {
     text-decoration: none;
     font-style: italic;
-    float: right;
     margin-bottom: 5%;
     color: white;
     font-size: 0.8em;
+}
+
+#test-link
+{
+    float: left;
+}
+
+#reset-password-link
+{
+    float: right;
 }
 
 .field, .btn

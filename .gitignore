@@ -1,4 +1,11 @@
 .flaskenv
+.env
 app.db
 venv/
 __pycache__
+server_conf
+BACK_UP_CONF_FILES/
+BU__.env
+logs/
+remaining_tasks
+tests_en_cours.py

@@ -21,6 +21,9 @@ from app.auth import bp
 from app.auth.forms import LoginForm, ResetPasswordRequestForm, ResetPasswordForm
 from app.auth.email import send_password_reset_email
 
+from string import ascii_uppercase, digits
+from random import choices
+
 
 # ==================================================================================================
 #
@@ -88,12 +91,21 @@ def logout():
 
     tmp_article = Article.query.filter_by(title = "TMP").first()
 
+    current_user_username = current_user.username
+    current_user_is_guest = current_user.is_guest
+
     if tmp_article:
 
         db.session.delete(tmp_article)
         db.session.commit()
 
     logout_user()
+
+    if current_user_is_guest:
+
+        guest_user = User.query.filter_by(username = current_user_username).first()
+        db.session.delete(guest_user)
+        db.session.commit()    
 
     return redirect(url_for("auth.login"))
 
@@ -182,6 +194,60 @@ def reset_password(token):
         return redirect(url_for("auth.login"))
 
     return render_template("auth/reset_password.html", form = form)
+
+# =================================================
+@bp.route("/guest_test_request", methods = ["GET"])
+def guest_test_request():
+    """
+        View function for a guest to ask for a test session
+
+        :return: the view to be displayed
+        :rtype: str
+    """
+
+    if current_user.is_authenticated:
+
+        return redirect(url_for("main.index"))
+
+    return render_template("auth/guest_test_request.html", title = "Faire un essai ?")
+
+# ==================================================
+@bp.route("/start_guest_session", methods = ["GET"])
+def start_guest_session():
+    """
+        View function for a guest to start a session (limited in time duration)
+
+        :return: the view to be displayed
+        :rtype: str
+    """
+
+    if current_user.is_authenticated:
+
+        return redirect(url_for("main.index"))
+
+    users = User.query.all()
+    usernames_list = [ user.username for user in users ]
+
+    condition = True
+
+    while condition:
+
+        guest_username = "".join(choices(ascii_uppercase + digits, k = 10))
+
+        if guest_username not in usernames_list:
+
+            condition  = False
+
+    guest_user = User(username = guest_username,
+                      email = "dummy data",
+                      is_guest = True)
+
+    db.session.add(guest_user)
+    db.session.commit()
+
+    login_user(guest_user)
+
+    return redirect(url_for("main.index"))
 
 
 # ==================================================================================================

@@ -87,7 +87,7 @@ def create_article():
         :rtype: str
     """
 
-    if current_user.username == "invite" and g.number_of_articles >= 5:
+    if current_user.is_guest and g.number_of_articles >= 5:
 
         return redirect(url_for("main.index"))
 

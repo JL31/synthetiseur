@@ -35,7 +35,12 @@
                         </div>
 
                         <div>
-                            <a href="{{ url_for('auth.reset_password_request') }}">Mot de passe oublié</a>
+                            <a id="test-link"
+                               class="login-links"
+                               href="{{ url_for('auth.guest_test_request') }}">Envie de faire un essai ?</a>
+                            <a id="reset-password-link"
+                               class="login-links"
+                               href="{{ url_for('auth.reset_password_request') }}">Mot de passe oublié</a>
                         </div>
 
                         <button type="submit" class="btn" style="width: 100%">Connexion</button>

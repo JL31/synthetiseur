@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block app_content %}
+    <h2>{{ title }}</h2>
+
+    <br>
+
+    <p>
+        Bonjour,<br><br>
+
+        Vous souhaitez faire un essai du site du synthétiseur ? Ce sera avec plaisir !<br><br>
+
+        Pour ce faire c'est très simple, il vous suffit de cliquer sur le bouton <strong style="color: green">Démarrer l'essai</strong>.<br>
+        Sinon vous pouvez cliquer sur le bouton <strong style="color: orange">Annuler</strong> pour revenir à la page d'accueil du site.<br><br>
+
+        Si vous choisissez de faire une essai cela vous ouvrira une session <strong>invité</strong>.<br>
+
+        En tant qu'<strong>invité</strong> vous pourrez faire les mêmes choses qu'un utilisateur normal mais avec les limitations suivantes :<br><br>
+        - nombre maximal d'articles : <strong style="color: red">5</strong> (une fois le quota atteint un message s'affichera, message qui disparaitra une fois un article supprimé) ;<br>
+        - pas de posibilité de visualiser/éditer le profil utilisateur ;<br>
+        - ... c'est tout ^^ !<br><br>
+        
+        A noter que j'héberge le site sur mon ordinateur personnel, qui n'est pas vraiment une "machine de guerre". C'est pourquoi je ne lancerai le serveur que pendant des horaires "normaux" (par exemple 9h - 18h).<br><br>
+
+        Cela explique également le fait que la recherche d'articles par mots clés, qui fonctionne très bien sur le serveur de développement (si si je vous assure, j'ai testé !), n'est pour le moment pas mise en place sur le serveur de production (Elasticsearch étant très gourmand en ressources).<br><br>
+
+        J'ai pour projet, dans un futur relativement proche, d'héberger ce site sur un Raspberry Pi doté de suffisament de mémoire pour permettre de lever cette limitation.<br><br>
+
+        Merci pour votre compréhension et bonne utilisation :-)<br><br>
+
+        <strong>L'équipe de développement, a.k.a. <a href="https://www.linkedin.com/in/julien-lepain/" target="_blank">Julien</a></strong><br><br>
+
+        P.S. : si le projet vous intéresse vous pouvez trouver les sources <a href="https://github.com/JL31/synthetiseur" target="_blank">ici</a>
+    </p>
+
+    <hr>
+
+    <div class="row">
+        <a href="{{ url_for('auth.login') }}" type="submit" class="btn btn-warning" style="width: 25%; float: left">Annuler</a>
+        <a href="{{ url_for('auth.start_guest_session') }}" class="btn btn-success" style="width: 25%; float: right">Démarrer l'essai</a>
+    </div>
+
+    <br>
+{% endblock %}
