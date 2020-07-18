@@ -1,5 +1,5 @@
 """
-    Module to handle the errors for the application
+    Module to handle the tokens for the "api" blueprint
 """
 
 # ==================================================================================================
@@ -8,11 +8,10 @@
 #
 # ==================================================================================================
 
-from flask import render_template, request
-
+from flask import jsonify
 from app import db
-from app.errors import bp
-from app.api.errors import error_response as api_error_response
+from app.api import bp
+from app.api.auth import basic_auth, token_auth
 
 
 # ==================================================================================================
@@ -33,41 +32,33 @@ from app.api.errors import error_response as api_error_response
 #
 # ==================================================================================================
 
-# ========================
-def wants_json_response():
+# ======================================
+@bp.route("/tokens", methods = ["POST"])
+@basic_auth.login_required
+def get_token():
     """
         ...
     """
 
-    return request.accept_mimetypes["application/json"] >= request.accept_mimetypes["text/html"]
+    token = basic_auth.current_user().get_token()
 
-# =========================
-@bp.app_errorhandler(404)
-def not_found_error(error):
+    db.session.commit()
+
+    return jsonify({"token": token})
+
+# ========================================
+@bp.route("/tokens", methods = ["DELETE"])
+@token_auth.login_required
+def revoke_token():
     """
-        Function to display specific page for 400 error
-    """
-
-    if wants_json_response():
-
-        return api_error_response(404)
-
-    return render_template("errors/error_404.html"), 404
-
-# ========================
-@bp.app_errorhandler(500)
-def internal_error(error):
-    """
-        Function to display specific page for 500 error
+        ...
     """
 
-    db.session.rollback()
+    token_auth.current_user().revoke_token()
 
-    if wants_json_response():
+    db.session.commit()
 
-        return api_error_response(500)
-
-    return render_template("errors/error_500.html"), 500
+    return "", 204
 
 
 # ==================================================================================================

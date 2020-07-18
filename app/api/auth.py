@@ -1,5 +1,5 @@
 """
-    Module to handle the errors for the application
+    Module to handle the authentication for the "api" blueprint
 """
 
 # ==================================================================================================
@@ -8,11 +8,9 @@
 #
 # ==================================================================================================
 
-from flask import render_template, request
-
-from app import db
-from app.errors import bp
-from app.api.errors import error_response as api_error_response
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
+from app.models import User
+from app.api.errors import error_response
 
 
 # ==================================================================================================
@@ -20,6 +18,10 @@ from app.api.errors import error_response as api_error_response
 # INITIALIZATIONS
 #
 # ==================================================================================================
+
+basic_auth = HTTPBasicAuth()
+token_auth = HTTPTokenAuth()
+
 
 # ==================================================================================================
 #
@@ -33,41 +35,51 @@ from app.api.errors import error_response as api_error_response
 #
 # ==================================================================================================
 
-# ========================
-def wants_json_response():
+# ======================================
+@basic_auth.verify_password
+def verify_password(username, password):
     """
         ...
     """
 
-    return request.accept_mimetypes["application/json"] >= request.accept_mimetypes["text/html"]
+    user = User.query.filter_by(username = username).first()
 
-# =========================
-@bp.app_errorhandler(404)
-def not_found_error(error):
+    if user and user.check_password(password):
+
+        return user
+
+# ===========================
+@basic_auth.error_handler
+def basic_auth_error(status):
     """
-        Function to display specific page for 400 error
-    """
-
-    if wants_json_response():
-
-        return api_error_response(404)
-
-    return render_template("errors/error_404.html"), 404
-
-# ========================
-@bp.app_errorhandler(500)
-def internal_error(error):
-    """
-        Function to display specific page for 500 error
+        ...
     """
 
-    db.session.rollback()
+    return error_response(status)
 
-    if wants_json_response():
+# ======================
+@token_auth.verify_token
+def verify_token(token):
+    """
+        ...
+    """
 
-        return api_error_response(500)
+    if token:
 
-    return render_template("errors/error_500.html"), 500
+        return User.check_token(token)
+
+    else:
+
+        return None
+
+# ===========================
+@token_auth.error_handler
+def token_auth_error(status):
+    """
+        ...
+    """
+
+    return error_response(status)
 
 
 # ==================================================================================================
