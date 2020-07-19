@@ -395,7 +395,7 @@ class Article(SearchableMixin, db.Model):
                 "update_date": self.update_date.strftime("%d/%m/%Y, %H:%M:%S"),
                 "references": [ reference.description for reference in self.references ],
                 "synthesis": self.synthesis
-                }
+               }
 
         return data
 
