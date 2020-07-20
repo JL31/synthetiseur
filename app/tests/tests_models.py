@@ -76,6 +76,7 @@ class TestUserModel(TestCase):
             Method to test the creation of a User
         """
 
+        # Addition and test of a user
         test_user_1 = User(username = "Bob", email = "dummy data")
 
         db.session.add(test_user_1)
@@ -85,11 +86,64 @@ class TestUserModel(TestCase):
         self.assertEqual(test_user_1.email, "dummy data")
         self.assertEqual(test_user_1.is_guest, False)
 
+
+        # Addition and test of a second user (a guest one) 
         test_user_2 = User(username = "Bobinette", email = "dummy data 2", is_guest = True)
 
         self.assertEqual(test_user_2.username, "Bobinette")
         self.assertEqual(test_user_2.email, "dummy data 2")
         self.assertEqual(test_user_2.is_guest, True)
+
+
+        # Addition and test of several articles to a user
+        test_article_1 = Article(title = "Test 1", synthesis = "Synthèse 1", user_id = test_user_1.id)
+        db.session.add(test_article_1)
+
+        test_article_2 = Article(title = "Test 2", synthesis = "Synthèse 2", user_id = test_user_1.id)
+        db.session.add(test_article_2)
+
+        test_article_3 = Article(title = "Test 3", synthesis = "Synthèse 3", user_id = test_user_1.id)
+        db.session.add(test_article_3)
+
+        db.session.commit()
+
+        test_user_1_articles = test_user_1.articles.all()
+        test_user_1_articles_titles = [ item.title for item in test_user_1_articles ]
+        test_user_1_articles_synthesis = [ item.synthesis for item in test_user_1_articles ]
+
+        self.assertEqual(test_user_1_articles_titles, ["Test 1", "Test 2", "Test 3"])
+        self.assertEqual(test_user_1_articles_synthesis, ["Synthèse 1", "Synthèse 2", "Synthèse 3"])
+
+
+        # Addition and test of several references to an article for a user
+        test_reference_1 = Reference(description = "www.bidon.fr", article = test_article_1)
+        db.session.add(test_reference_1)
+
+        test_reference_2 = Reference(description = "Python", article = test_article_1)
+        db.session.add(test_reference_2)
+
+        test_reference_3 = Reference(description = "aze", article = test_article_1)
+        db.session.add(test_reference_3)
+
+        test_reference_4 = Reference(description = "tut", article = test_article_3)
+        db.session.add(test_reference_4)
+
+        test_reference_5 = Reference(description = "tot", article = test_article_3)
+        db.session.add(test_reference_5)
+
+        db.session.commit()
+
+        test_user_1_articles_references = []
+
+        for current_article in test_user_1_articles:
+
+            if current_article.references.all():
+
+                for current_reference in current_article.references.all():
+
+                    test_user_1_articles_references.append(current_reference.description)
+
+        self.assertEqual(test_user_1_articles_references, ["www.bidon.fr", "Python", "aze", "tut", "tot"])
 
     # ==============================
     def test_password_hashing(self):
@@ -412,6 +466,6 @@ class TestReferenceModel(TestCase):
 #
 # ==================================================================================================
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     main(verbosity = 1)
