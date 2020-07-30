@@ -182,6 +182,10 @@ def article(article_number):
 
     article = Article.query.get_or_404(int(article_number))
 
+    if article.user_id != current_user.id:
+
+        return render_template("errors/error_404.html"), 404
+
     article_creation_date = article.creation_date.strftime("%d/%m/%Y %H:%M:%S")
     article_update_date = article.update_date.strftime("%d/%m/%Y %H:%M:%S")
 
