@@ -50,9 +50,17 @@ class Config(object):
 
     ADMINS = os.environ.get("ADMINS")
 
+    # Elasticsearch configuration
     ELASTICSEARCH_URL = os.environ.get("ELASTICSEARCH_URL")
-
     SEARCH_ARTICLES_PER_PAGE = int(os.environ.get("SEARCH_ARTICLES_PER_PAGE"))
+
+    # OAuth configuration
+    OAUTH_CREDENTIALS = {
+                         "github": {
+                                    "id": os.environ.get("OAUTH_CREDENTIALS_GITHUB_ID"),
+                                    "secret" : os.environ.get("OAUTH_CREDENTIALS_GITHUB_SECRET")
+                                   }
+                        }
 
 
 # ==================================================================================================

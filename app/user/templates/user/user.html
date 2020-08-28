@@ -15,6 +15,18 @@
         <br><br>
 
         <div class="list-group-item list-group-item-info">
+            Login du compte GitHub
+        </div>
+
+        <br>{% if user.github_login.startswith("syntNone-") and user.github_login.endswith("-syntNone") %}
+            &nbsp;&nbsp;*** pas de login indiqué ***
+        {% else %}
+            &nbsp;&nbsp;{{ user.github_login }}
+        {% endif %}
+
+        <br><br>
+
+        <div class="list-group-item list-group-item-info">
             Adresse email
         </div>
 

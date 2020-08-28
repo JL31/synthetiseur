@@ -67,10 +67,6 @@ def get_users():
         :rtype: flask.wrappers.Response
     """
 
-
-    # droits seulement pour l'admin ?
-
-
     users_list = User.query.all()
 
     users_data = [ user.to_dict() for user in users_list ]
@@ -91,34 +87,63 @@ def create_user():
         :rtype: flask.wrappers.Response
     """
 
-
-    # droits seulement pour l'admin ?
-
-
+    # request data retrieval
     data = request.get_json() or {}
 
+    # test if username, email and password are in the request data (they must be)
     if "username" not in data or "email" not in data or "password" not in data:
 
         return bad_request("Must include username, email and password fields")
 
+    # github login case : if in request data must be different than the ones already chosen
+    if "github_login" in data:
+
+        if User.query.filter_by(github_login = data["github_login"]).first():
+
+            return bad_request("Please use a different username")
+
+    # github login case : if no GitHub login filled-in then a random one is chosen
+    else:
+
+        github_logins = [ user_data.github_login for user_data in User.query.all() ]
+        condition = True
+
+        while condition:
+
+            tmp_github_login = "{}{}{}".format("syntNone-",
+                                               "".join(choices(ascii_letters + digits, k = 6)),
+                                               "-syntNone")
+
+            if tmp_github_login not in github_logins:
+
+                condition = False
+
+        data["github_login"] = tmp_github_login
+
+    # test if chosen username is not already picked
     if User.query.filter_by(username = data["username"]).first():
 
         return bad_request("Please use a different username")
 
+    # test if chosen email is not already picked
     if User.query.filter_by(email = data["email"]).first():
 
         return bad_request("Please use a different email address")
 
+    # user creation
     user = User()
     user.from_dict(data, new_user = True)
 
+    # user addition into DB
     db.session.add(user)
     db.session.commit()
 
+    # response creation
     response = jsonify(user.to_dict())
     response.status_code = 201
     response.headers["Location"] = url_for("api.get_user", id = user.id)
 
+    # function return
     return response
 
 # =============================================
@@ -145,6 +170,10 @@ def update_user(id):
     if "username" in data and data["username"] == user.username and User.query.filter_by(username = data["username"]).first():
 
         return bad_request("Please use a different username")
+
+    if "github_login" in data and data["github_login"] == user.github_login and User.query.filter_by(github_login = data["github_login"]).first():
+
+        return bad_request("Please use a different GitHub login")
 
     if "email" in data and data["email"] == user.email and User.query.filter_by(email = data["email"]).first():
 

@@ -43,7 +43,13 @@
                                href="{{ url_for('auth.reset_password_request') }}">Mot de passe oublié</a>
                         </div>
 
-                        <button type="submit" class="btn" style="width: 100%">Connexion</button>
+                        <div>
+                            <button type="submit" class="btn" style="width: 100%">Connexion</button>
+                            <hr/>
+                            <a href="{{ url_for('auth.oauth_authorize', provider='github') }}">
+                                <img style="width: 100%" src="{{ url_for('static', filename='images/GitHub_connexion.jpeg') }}"></img>
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>

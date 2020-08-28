@@ -17,6 +17,9 @@ from app.models import User, Article
 from app.user import bp
 from app.user.forms import UserProfileEditorForm
 
+from string import ascii_letters, digits
+from random import choices
+
 
 # ==================================================================================================
 #
@@ -89,12 +92,43 @@ def user_profile_edition():
         db.session.delete(tmp_article)
         db.session.commit()
 
-    form = UserProfileEditorForm(current_user.username)
+    if current_user.github_login.startswith("syntNone-") and current_user.github_login.endswith("-syntNone"):
+
+        github_login = ""
+
+    else:
+
+        github_login = current_user.github_login
+
+    form = UserProfileEditorForm(current_user.username,
+                                 github_login,
+                                 current_user.email)
 
     if form.validate_on_submit():
 
         current_user.username = form.username.data
         current_user.email = form.email.data
+
+        if form.github_login.data != "":
+
+            current_user.github_login = form.github_login.data
+
+        else:
+
+            github_logins = [ user_data.github_login for user_data in User.query.all() ]
+            condition = True
+
+            while condition:
+
+                tmp_github_login = "{}{}{}".format("syntNone-",
+                                                   "".join(choices(ascii_letters + digits, k = 6)),
+                                                   "-syntNone")
+
+                if tmp_github_login not in github_logins:
+
+                    condition = False
+
+            current_user.github_login = tmp_github_login
 
         db.session.commit()
 
@@ -105,6 +139,7 @@ def user_profile_edition():
     elif request.method == "GET":
 
         form.username.data = current_user.username
+        form.github_login.data = github_login
         form.email.data = current_user.email
 
     return render_template("user/user_profile_editor.html",

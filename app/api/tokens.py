@@ -37,7 +37,10 @@ from app.api.auth import basic_auth, token_auth
 @basic_auth.login_required
 def get_token():
     """
-        ...
+        Method to get a token during API authentication process
+
+        :return: .
+        :rtype: .
     """
 
     token = basic_auth.current_user().get_token()
@@ -51,7 +54,10 @@ def get_token():
 @token_auth.login_required
 def revoke_token():
     """
-        ...
+        Method to revoke a token granted during API authentication process
+
+        :return: the response
+        :rtype: werkzeug.wrappers.response.Response
     """
 
     token_auth.current_user().revoke_token()

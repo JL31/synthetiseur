@@ -19,6 +19,8 @@ from time import time
 import jwt
 from base64 import b64encode
 from os import urandom
+from string import ascii_uppercase, digits
+from random import choices
 
 
 # ==================================================================================================
@@ -164,6 +166,7 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(64), index = True, unique = True)
+    github_login = db.Column(db.String(64), index = True, unique = True)
     email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
     articles = db.relationship("Article", backref = "author", lazy = "dynamic", cascade="all,delete")
@@ -288,7 +291,7 @@ class User(UserMixin, db.Model):
             :type new_user: bool            
         """
 
-        for field in ["username", "email", "is_guest"]:
+        for field in ["username", "github_login", "email", "is_guest"]:
 
             if field in data:
 
