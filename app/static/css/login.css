@@ -1,60 +1,24 @@
-.container
+.form-elements
 {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -70%);
+    /* vertical centering of form */
+    margin-top: 40vh;
+    transform: translateY(-60%);
+
+    /* horizontal centering of form elements */
+    display: flex;
+    justify-content: center   
 }
 
-h1
+.login-page-title
 {
+    margin-top: 5%;
     text-align: center;
-    position: absolute;
-    top: 10%;
-    left: 25%;
     color: rgb(76, 76, 81);
 }
 
-/* Pris directement de bootstrap */
-.alert
+.username-field, .password-field, #test-link, #reset-password-link, #login-button, .github-login-button
 {
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-}
-
-/* Pris directement de bootstrap */
-.alert-danger
-{
-    color: #a94442;
-    background-color: #f2dede;
-    border-color: #ebccd1;
-}
-
-.username-field
-{
-    margin-top: 25%;
     margin-bottom: 5%;
-}
-
-.password-field
-{
-    margin-bottom: 3%;
-}
-
-input
-{
-    height: 50px;
-}
-
-.login-links
-{
-    text-decoration: none;
-    font-style: italic;
-    margin-bottom: 5%;
-    color: white;
-    font-size: 0.8em;
 }
 
 #test-link
@@ -67,9 +31,40 @@ input
     float: right;
 }
 
-.field, .btn
+.login-links
+{
+    text-decoration: none;
+    font-style: italic;
+    margin-bottom: 1%;
+    color: white;
+    font-size: 0.8em;
+}
+
+#username, #password, .field, .btn, .github-login-button
 {
     height: 50px;
+    max-width: 200px;
+}
+
+.github-login-button
+{
+    width: 200px;
+}
+
+.btn:hover
+{
+    border: 1px solid black;
+    background: rgb(242, 241, 240);
+}
+
+.github-login-button
+{
+    border-radius: 5px;
+}
+
+.github-login-button:hover
+{
+    border: 1px solid black;
 }
 
 body

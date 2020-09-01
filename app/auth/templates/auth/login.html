@@ -1,58 +1,67 @@
-<html>
-    <head>
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='css/login.css') }}">
-    </head>
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
-    <body>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+{% block styles %}
+    {{ super() }}
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
 
-        <div class="overall">
-            <h1>Bienvenue sur le site du Synthetiseur</h1>
+{% block title %}
+    Synthétiseur - {{ title }}
+{% endblock %}
 
-            <div class="container">
-                <form action = "" method = "post">
-                    {{ form.hidden_tag() }}
+{% block content %}
+    <div class="wrapper">
+        <div class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info" role="alert">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-                    <div class="row">
-                        <div class="username-field">
-                            {{ form.username(size = 30, placeholder = "Nom d'utilisateur") }}<br>
-                            {% for error in form.username.errors %}
-                                <span style = "color: red;">{{ error }}</span>
-                            {% endfor %}
-                        </div>
+            <h1 class="login-page-title">Bienvenue sur le site du Synthetiseur</h1>
 
-                        <div class="password-field">
-                            {{ form.password(size = 30, placeholder = "Mot de passe") }}<br>
-                            {% for error in form.password.errors %}
-                                <span style = "color: red;">{{ error }}</span>
-                            {% endfor %}
-                        </div>
+            <form action = ""
+                  method = "post"
+                  class="form-elements">
+                {{ form.hidden_tag() }}
 
-                        <div>
-                            <a id="test-link"
-                               class="login-links"
-                               href="{{ url_for('auth.guest_test_request') }}">Envie de faire un essai ?</a>
-                            <a id="reset-password-link"
-                               class="login-links"
-                               href="{{ url_for('auth.reset_password_request') }}">Mot de passe oublié</a>
-                        </div>
-
-                        <div>
-                            <button type="submit" class="btn" style="width: 100%">Connexion</button>
-                            <hr/>
-                            <a href="{{ url_for('auth.oauth_authorize', provider='github') }}">
-                                <img style="width: 100%" src="{{ url_for('static', filename='images/GitHub_connexion.jpeg') }}"></img>
-                            </a>
-                        </div>
+                <div class="row">
+                    <div class="username-field">
+                        {{ form.username(size = 30, placeholder = "Nom d'utilisateur") }}<br>
+                        {% for error in form.username.errors %}
+                            <span style = "color: red;">{{ error }}</span>
+                        {% endfor %}
                     </div>
-                </form>
-            </div>
+
+                    <div class="password-field">
+                        {{ form.password(size = 30, placeholder = "Mot de passe") }}<br>
+                        {% for error in form.password.errors %}
+                            <span style = "color: red;">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        <a id="test-link"
+                           class="login-links"
+                           href="{{ url_for('auth.guest_test_request') }}">Envie de faire un essai ?</a>
+                           <br/>
+                        <a id="reset-password-link"
+                           class="login-links"
+                           href="{{ url_for('auth.reset_password_request') }}">Mot de passe oublié</a>
+                    </div>
+
+                    <div>
+                        <button id="login-button" type="submit" class="btn btn-light btn-block">Connexion</button>
+                        <a href="{{ url_for('auth.oauth_authorize', provider='github') }}">
+                            <img class="github-login-button" src="{{ url_for('static', filename='images/GitHub_connexion.jpeg') }}"></img>
+                        </a>
+                    </div>
+
+                </div>
+            </form>
         </div>
-    </body>
-</html>
+    </div>
+{% endblock %}
