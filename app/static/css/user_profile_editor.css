@@ -1,0 +1,19 @@
+
+.user-profile-editor
+{
+    display: flex;
+    flex-direction: column;
+    min-width: 330px;
+    max-width: 330px;
+}
+
+#username, #github_login, #email
+{
+    margin-bottom: 5px;
+}
+
+#submit
+{
+    background: rgb(92, 184, 92);
+    color: white;
+}

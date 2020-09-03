@@ -1,0 +1,29 @@
+
+@media (max-width: 700px)
+{
+    .references
+    {
+        max-width: 330px;
+    }
+}
+
+@media (min-width: 700px)
+{
+    .references
+    {
+        min-width: 700px;
+    }
+}
+
+.references
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.references :nth-child(2)
+{
+    flex: 1 0 0;
+    overflow-wrap: anywhere;
+}

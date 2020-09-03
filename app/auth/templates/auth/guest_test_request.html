@@ -37,8 +37,13 @@
     <hr>
 
     <div class="row">
-        <a href="{{ url_for('auth.login') }}" type="submit" class="btn btn-warning" style="width: 25%; float: left">Annuler</a>
-        <a href="{{ url_for('auth.start_guest_session') }}" class="btn btn-success" style="width: 25%; float: right">Démarrer l'essai</a>
+        <a href="{{ url_for('auth.login') }}"
+           type="submit"
+           class="btn btn-warning"
+           style="width: 25%; min-width: 130px; float: left; margin-left: 10px">Annuler</a>
+        <a href="{{ url_for('auth.start_guest_session') }}"
+           class="btn btn-success"
+           style="width: 25%; min-width: 130px; float: right; margin-right: 15px">Démarrer l'essai</a>
     </div>
 
     <br>

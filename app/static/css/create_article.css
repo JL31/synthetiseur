@@ -1,0 +1,28 @@
+
+@media (max-width: 700px)
+{
+    .row
+    {
+        max-width: 330px;
+    }
+}
+
+@media (min-width: 700px)
+{
+    .row
+    {
+        min-width: 700px;
+        max-width: 700px;
+    }
+}
+
+.row
+{
+    display: flex;
+    flex-direction: column;
+}
+
+#title, #references, #synthesis
+{
+    margin-bottom: 5px;
+}
