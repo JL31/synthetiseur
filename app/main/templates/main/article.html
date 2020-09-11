@@ -34,7 +34,7 @@
     
     <div>
         <p><b>Synthèse</b></p>
-        <p style="white-space: pre-wrap">{{ article.synthesis }}</p>   <!-- "pre-wrap" for the spaces and break lines to be taken into account -->
+        <p style="white-space: pre-wrap">{{ article.synthesis | safe }}</p>   <!-- "pre-wrap" for the spaces and break lines to be taken into account -->
     </div>
 
     <hr>

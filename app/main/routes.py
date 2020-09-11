@@ -55,7 +55,7 @@ def before_request():
         articles = current_user.articles.all()
         g.number_of_articles = len(articles)
 
-# ==================
+# =================
 @bp.route("/")
 @bp.route("/index")
 @login_required
@@ -76,7 +76,7 @@ def index():
 
     return render_template("main/index.html", title = "Index")
 
-# ============================================================
+# =====================================================
 @bp.route("/create_article", methods = ["GET", "POST"])
 @login_required
 def create_article():
@@ -135,7 +135,7 @@ def create_article():
                            references = references,
                            submit_button_title = "Ajouter")
 
-# ===============================
+# ==============================
 @bp.route("/user_articles_list")
 @login_required
 def user_articles_list():
@@ -159,7 +159,7 @@ def user_articles_list():
                            title = "Liste de mes articles",
                            articles_list = articles_list)
 
-# =====================================
+# ====================================
 @bp.route("/article/<article_number>")
 @login_required
 def article(article_number):
@@ -200,7 +200,7 @@ def article(article_number):
 
     return render_template("main/article.html", article = article, dates = dates)
 
-# =======================================================================
+# ======================================================================
 @bp.route("/modify_article/<article_number>", methods = ["GET", "POST"])
 @login_required
 def modify_article(article_number):
@@ -253,7 +253,7 @@ def modify_article(article_number):
                            references = references,
                            submit_button_title = "Valider les modifications")
 
-# =======================================================================
+# ======================================================================
 @bp.route("/delete_article/<article_number>", methods = ["GET", "POST"])
 @login_required
 def delete_article(article_number):
@@ -283,7 +283,7 @@ def delete_article(article_number):
 
     return redirect(url_for("main.user_articles_list"))
 
-# =============================================================================
+# ============================================================================
 @bp.route("/add_reference/<user_id>/<current_article_id>", methods = ["POST"])
 @login_required
 def add_reference(user_id, current_article_id):
@@ -334,7 +334,7 @@ def add_reference(user_id, current_article_id):
 
     return jsonify(data)
 
-# ====================================================================================
+# ===================================================================================
 @bp.route("/delete_reference/<reference_id>/<current_article_id>", methods = ["GET"])
 @login_required
 def delete_reference(reference_id, current_article_id):
@@ -374,7 +374,7 @@ def delete_reference(reference_id, current_article_id):
 
     return jsonify(data)
 
-# ====================================================
+# ===================================================
 @bp.route("/check_article_title", methods = ["POST"])
 @login_required
 def check_article_title():
@@ -443,7 +443,7 @@ def search():
                            next_url = next_url,
                            prev_url = prev_url)
 
-# ====================================================================================================
+# ===================================================================================================
 @bp.route("/article_deletion_confirmation_modal_content_loading/<article_number>", methods = ["GET"])
 @login_required
 def article_deletion_confirmation_modal_content_loading(article_number):

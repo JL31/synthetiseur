@@ -77,20 +77,22 @@ class TestUserModel(TestCase):
         """
 
         # Addition and test of a user
-        test_user_1 = User(username = "Bob", email = "dummy data")
+        test_user_1 = User(username = "Bob", github_login = "git-test", email = "dummy data")
 
         db.session.add(test_user_1)
         db.session.commit()
 
         self.assertEqual(test_user_1.username, "Bob")
+        self.assertEqual(test_user_1.github_login, "git-test")
         self.assertEqual(test_user_1.email, "dummy data")
         self.assertEqual(test_user_1.is_guest, False)
 
 
         # Addition and test of a second user (a guest one) 
-        test_user_2 = User(username = "Bobinette", email = "dummy data 2", is_guest = True)
+        test_user_2 = User(username = "Bobinette", github_login = "git-test-2", email = "dummy data 2", is_guest = True)
 
         self.assertEqual(test_user_2.username, "Bobinette")
+        self.assertEqual(test_user_2.github_login, "git-test-2")
         self.assertEqual(test_user_2.email, "dummy data 2")
         self.assertEqual(test_user_2.is_guest, True)
 
@@ -154,7 +156,7 @@ class TestUserModel(TestCase):
             - "check_password" method
         """
 
-        test_user = User(username = "Bob", email = "dummy data")
+        test_user = User(username = "Bob", github_login = "git-test", email = "dummy data")
         test_user.set_password("bob123456")
 
         self.assertFalse(test_user.check_password("tot"))
@@ -166,7 +168,7 @@ class TestUserModel(TestCase):
             Test of the password reset token prodecude
         """
 
-        test_user = User(username = "Bob", email = "dummy data")
+        test_user = User(username = "Bob", github_login = "git-test", email = "dummy data")
 
         db.session.add(test_user)
         db.session.commit()
@@ -184,7 +186,7 @@ class TestUserModel(TestCase):
             Test of the "to_dict" method
         """
 
-        test_user = User(username = "Bob", email = "dummy data")
+        test_user = User(username = "Bob", github_login = "git-test", email = "dummy data")
 
         db.session.add(test_user)
         db.session.commit()
@@ -209,6 +211,10 @@ class TestUserModel(TestCase):
 
         self.assertEqual(test_user.to_dict(include_email = True), data)
 
+        data["github_login"] = "git-test"
+
+        self.assertEqual(test_user.to_dict(include_email = True, include_github_login = True), data)
+
     # =======================
     def test_from_dict(self):
         """
@@ -219,6 +225,7 @@ class TestUserModel(TestCase):
 
         data = {
                 "username": "Bob",
+                "github_login": "git-test",
                 "email": "dummy data",
                 "is_guest": False,
                }
@@ -226,11 +233,13 @@ class TestUserModel(TestCase):
         test_user.from_dict(data, new_user = True)
 
         self.assertEqual(test_user.username, "Bob")
+        self.assertEqual(test_user.github_login, "git-test")
         self.assertEqual(test_user.email, "dummy data")
         self.assertEqual(test_user.is_guest, False)
 
         data = {
                 "username": "Bobinette",
+                "github_login": "git-test-2",
                 "email": "dummy data 2",
                 "password": "bobinette123456",
                 "is_guest": True,
@@ -239,12 +248,14 @@ class TestUserModel(TestCase):
         test_user.from_dict(data, new_user = True)
 
         self.assertEqual(test_user.username, "Bobinette")
+        self.assertEqual(test_user.github_login, "git-test-2")
         self.assertEqual(test_user.email, "dummy data 2")
         self.assertTrue(test_user.check_password("bobinette123456"))
         self.assertEqual(test_user.is_guest, True)
 
         data = {
                 "username": "Bobby",
+                "github_login": "git-test-3",
                 "email": "dummy data",
                 "is_guest": False,
                }
@@ -252,6 +263,7 @@ class TestUserModel(TestCase):
         test_user.from_dict(data)
 
         self.assertEqual(test_user.username, "Bobby")
+        self.assertEqual(test_user.github_login, "git-test-3")
         self.assertEqual(test_user.email, "dummy data")
         self.assertEqual(test_user.is_guest, False)
 
@@ -273,7 +285,7 @@ class TestUserModel(TestCase):
             Method to test the token procedure (normally through APIs)
         """
 
-        test_user = User(username = "Bob", email = "dummy data")
+        test_user = User(username = "Bob", github_login = "git-test", email = "dummy data")
         test_user_token = test_user.get_token()
 
         self.assertEqual(User.check_token("fake_token_123"), None)
@@ -318,7 +330,7 @@ class TestArticleModel(TestCase):
             Method to test the creation of an Article
         """
 
-        test_user = User(username = "Bob", email = "dummy data")
+        test_user = User(username = "Bob", github_login = "git-test", email = "dummy data")
         db.session.add(test_user)
         db.session.commit()
 
@@ -336,7 +348,7 @@ class TestArticleModel(TestCase):
             Test of the "to_dict" method
         """
 
-        test_user = User(username = "Bob", email = "dummy data")
+        test_user = User(username = "Bob", github_login = "git-test", email = "dummy data")
         db.session.add(test_user)
         db.session.commit()
 
@@ -363,7 +375,7 @@ class TestArticleModel(TestCase):
             Test of the "from_dict" method
         """
 
-        test_user = User(username = "Bob", email = "dummy data")
+        test_user = User(username = "Bob", github_login = "git-test", email = "dummy data")
         db.session.add(test_user)
         db.session.commit()
 
@@ -437,7 +449,7 @@ class TestReferenceModel(TestCase):
             Method to test the creation of a Reference
         """
 
-        test_user = User(username = "Bob", email = "dummy data")
+        test_user = User(username = "Bob", github_login = "git-test", email = "dummy data")
         db.session.add(test_user)
         db.session.commit()
 

@@ -51,7 +51,7 @@ class ModifyArticle(FlaskForm):
 # ==========================
 class SearchForm(FlaskForm):
     """
-        Class to create a form to do an research among created Article title and synthesis fields values
+        Class to create a form to do a research among created Article title and synthesis fields values
     """
 
     q = StringField("Rechercher un article", validators = [DataRequired()])

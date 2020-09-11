@@ -251,13 +251,16 @@ class User(UserMixin, db.Model):
 
         return User.query.get(id)
 
-    # =======================================
-    def to_dict(self, include_email = False):
+    # =====================================================================
+    def to_dict(self, include_email = False, include_github_login = False):
         """
             Method to return some current User data in JSON format for use through API
 
             :param include_email: boolean that indicates if the current User email address shall appear in the returned set of data
             :type include_email: bool
+
+            :param include_github_login: boolean that indicates if the current User GitHub login shall appear in the returned set of data
+            :type include_github_login: bool
 
             :return: some current User data at JSON format (dict-like)
             :rtype: dict
@@ -276,6 +279,10 @@ class User(UserMixin, db.Model):
         if include_email:
 
             data["email"] = self.email
+
+        if include_github_login:
+
+            data["github_login"] = self.github_login
 
         return data
 
